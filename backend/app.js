@@ -8,6 +8,12 @@ const authRoutes =
 const movieRoutes =
     require("./routes/movieRoutes");
 
+const bookingRoutes =
+    require("./routes/bookingRoutes");
+
+const adminRoutes =
+    require("./routes/adminRoutes");
+
 
 const app =
     express();
@@ -75,6 +81,16 @@ app.use(
 app.use(
     "/api/movies",
     movieRoutes
+);
+
+app.use(
+    "/api/bookings",
+    bookingRoutes
+);
+
+app.use(
+    "/api/admin",
+    adminRoutes
 );
 
 

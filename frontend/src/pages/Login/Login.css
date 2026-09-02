@@ -50,7 +50,7 @@
     width: 100%;
     max-width: 430px;
 
-    padding: 42px;
+    padding: 38px 42px;
 
     background: #ffffff;
 
@@ -63,59 +63,55 @@
 
 
 /* =========================
-   LOGIN ICON
+   LOGO
 ========================= */
 
-.login-icon {
-    width: 58px;
-    height: 58px;
-
-    margin: 0 auto 16px;
+.login-logo {
+    width: 100%;
 
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
 
-    border-radius: 50%;
+    margin-bottom: 14px;
+}
 
-    background: #9b1d32;
+.login-logo img {
+    width: 150px;
+    height: auto;
 
-    font-size: 27px;
+    display: block;
 
-    text-align: center;
+    object-fit: contain;
 }
 
 
 /* =========================
-   HEADING
+   HEADER
 ========================= */
 
-.login-card h1 {
+.login-header {
+    text-align: center;
+
+    margin-bottom: 30px;
+}
+
+.login-header h1 {
     margin: 0 0 8px;
 
     color: #222222;
 
     font-size: 28px;
     font-weight: 700;
-
-    text-align: center;
 }
 
-
-/* =========================
-   SUBTITLE
-========================= */
-
-.login-subtitle {
-    margin: 0 0 30px;
+.login-header p {
+    margin: 0;
 
     color: #777777;
 
     font-size: 14px;
-
     line-height: 1.5;
-
-    text-align: center;
 }
 
 
@@ -160,7 +156,6 @@
     border-radius: 8px;
 
     background: #ffffff;
-
     color: #222222;
 
     font-size: 14px;
@@ -181,7 +176,6 @@
     position: relative;
 
     width: 100%;
-
     height: 48px;
 }
 
@@ -200,7 +194,6 @@
     border-radius: 8px;
 
     background: #ffffff;
-
     color: #222222;
 
     font-size: 14px;
@@ -236,7 +229,7 @@
 
 
 /* =========================
-   SHOW / HIDE PASSWORD
+   SHOW PASSWORD
 ========================= */
 
 .show-password {
@@ -262,11 +255,6 @@
 
     z-index: 2;
 }
-
-
-/* =========================
-   SHOW / HIDE HOVER
-========================= */
 
 .show-password:hover {
     color: #721525;
@@ -353,22 +341,12 @@
         box-shadow 0.2s ease;
 }
 
-
-/* =========================
-   LOGIN BUTTON HOVER
-========================= */
-
 .login-button:hover {
-    background: #7e1728;
+    background: #c00726;
 
     box-shadow:
         0 6px 18px rgba(155, 29, 50, 0.28);
 }
-
-
-/* =========================
-   LOGIN BUTTON ACTIVE
-========================= */
 
 .login-button:active {
     transform: translateY(1px);
@@ -417,7 +395,6 @@
     font-weight: 600;
 }
 
-
 .register-text a:hover {
     text-decoration: underline;
 }
@@ -437,7 +414,38 @@
         padding: 30px 24px;
     }
 
-    .login-card h1 {
+    .login-logo img {
+        width: 130px;
+    }
+
+    .login-header h1 {
         font-size: 24px;
+    }
+}
+/* =========================
+   SHARED MOVIE LOGO
+========================= */
+
+.login-logo {
+    width: 150px;
+    height: 110px;
+    margin: 0 auto 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+}
+
+.login-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+@media (max-width: 500px) {
+    .login-logo {
+        width: 130px;
+        height: 95px;
     }
 }

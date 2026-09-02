@@ -1,3 +1,17 @@
+/* =========================
+   GLOBAL BOX SIZING
+========================= */
+
+.register-page,
+.register-page * {
+    box-sizing: border-box;
+}
+
+
+/* =========================
+   REGISTER PAGE
+========================= */
+
 .register-page {
     width: 100%;
     min-height: 100vh;
@@ -7,8 +21,6 @@
     align-items: center;
 
     padding: 30px;
-
-    box-sizing: border-box;
 
     background:
         radial-gradient(
@@ -32,7 +44,7 @@
 
 /* =========================
    REGISTER CARD
-   ========================= */
+========================= */
 
 .register-card {
     width: 100%;
@@ -51,29 +63,40 @@
 
 
 /* =========================
-   HEADER
-   ========================= */
+   LOGO
+========================= */
 
-.register-header {
-    text-align: center;
-    margin-bottom: 30px;
-}
+.register-logo {
+    width: 110px;
+    height: 110px;
 
-.logo-circle {
-    width: 58px;
-    height: 58px;
-
-    margin: 0 auto 15px;
+    margin: 0 auto 12px;
 
     display: flex;
     justify-content: center;
     align-items: center;
 
-    border-radius: 50%;
+    background: transparent;
+}
 
-    background: #9b1d32;
+.register-logo img {
+    width: 100%;
+    height: 100%;
 
-    font-size: 27px;
+    object-fit: contain;
+
+    display: block;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.register-header {
+    text-align: center;
+
+    margin-bottom: 30px;
 }
 
 .register-header h1 {
@@ -97,7 +120,7 @@
 
 /* =========================
    FORM
-   ========================= */
+========================= */
 
 .form-group {
     margin-bottom: 19px;
@@ -117,7 +140,7 @@
 
 /* =========================
    INPUTS
-   ========================= */
+========================= */
 
 .form-group input[type="text"],
 .form-group input[type="email"],
@@ -134,7 +157,6 @@
     border-radius: 8px;
 
     background: #ffffff;
-
     color: #222222;
 
     font-size: 14px;
@@ -142,13 +164,23 @@
     outline: none;
 
     transition:
-        border-color 0.2s,
-        box-shadow 0.2s;
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
+
+
+/* =========================
+   PLACEHOLDER
+========================= */
 
 .form-group input::placeholder {
     color: #999999;
 }
+
+
+/* =========================
+   INPUT FOCUS
+========================= */
 
 .form-group input:focus {
     border-color: #9b1d32;
@@ -159,16 +191,28 @@
 
 
 /* =========================
-   PASSWORD
-   ========================= */
+   PASSWORD WRAPPER
+========================= */
 
 .password-wrapper {
     position: relative;
+
+    width: 100%;
 }
+
+
+/* =========================
+   PASSWORD INPUT
+========================= */
 
 .password-wrapper input {
     padding-right: 75px !important;
 }
+
+
+/* =========================
+   PASSWORD TOGGLE
+========================= */
 
 .password-toggle {
     position: absolute;
@@ -177,6 +221,8 @@
     top: 50%;
 
     transform: translateY(-50%);
+
+    padding: 4px 6px;
 
     border: none;
 
@@ -188,7 +234,14 @@
     font-weight: 600;
 
     cursor: pointer;
+
+    z-index: 2;
 }
+
+
+/* =========================
+   PASSWORD TOGGLE HOVER
+========================= */
 
 .password-toggle:hover {
     color: #721525;
@@ -196,8 +249,8 @@
 
 
 /* =========================
-   HINT
-   ========================= */
+   FIELD HINT
+========================= */
 
 .field-hint {
     display: block;
@@ -212,7 +265,7 @@
 
 /* =========================
    VALIDATION
-   ========================= */
+========================= */
 
 .form-group input:invalid:not(:placeholder-shown) {
     border-color: #c62828;
@@ -224,8 +277,32 @@
 
 
 /* =========================
+   ERROR
+========================= */
+
+.register-error {
+    width: 100%;
+
+    margin-bottom: 18px;
+
+    padding: 10px 12px;
+
+    border: 1px solid #e5a5a5;
+    border-radius: 7px;
+
+    background: #fdeaea;
+
+    color: #a51d2d;
+
+    font-size: 13px;
+
+    text-align: center;
+}
+
+
+/* =========================
    REGISTER BUTTON
-   ========================= */
+========================= */
 
 .register-button {
     width: 100%;
@@ -246,10 +323,15 @@
     cursor: pointer;
 
     transition:
-        background 0.2s,
-        transform 0.1s,
-        box-shadow 0.2s;
+        background 0.2s ease,
+        transform 0.1s ease,
+        box-shadow 0.2s ease;
 }
+
+
+/* =========================
+   REGISTER BUTTON HOVER
+========================= */
 
 .register-button:hover {
     background: #7e1728;
@@ -258,14 +340,32 @@
         0 6px 18px rgba(155, 29, 50, 0.28);
 }
 
+
+/* =========================
+   REGISTER BUTTON ACTIVE
+========================= */
+
 .register-button:active {
     transform: translateY(1px);
 }
 
 
 /* =========================
+   DISABLED BUTTON
+========================= */
+
+.register-button:disabled {
+    opacity: 0.7;
+
+    cursor: not-allowed;
+
+    box-shadow: none;
+}
+
+
+/* =========================
    LOGIN LINK
-   ========================= */
+========================= */
 
 .login-link {
     margin-top: 24px;
@@ -277,6 +377,11 @@
     font-size: 14px;
 }
 
+
+/* =========================
+   LOGIN LINK
+========================= */
+
 .login-link a {
     margin-left: 5px;
 
@@ -287,6 +392,11 @@
     font-weight: 600;
 }
 
+
+/* =========================
+   LOGIN LINK HOVER
+========================= */
+
 .login-link a:hover {
     text-decoration: underline;
 }
@@ -294,7 +404,7 @@
 
 /* =========================
    MOBILE
-   ========================= */
+========================= */
 
 @media (max-width: 500px) {
 
@@ -306,7 +416,42 @@
         padding: 30px 24px;
     }
 
+    .register-logo {
+        width: 90px;
+        height: 90px;
+
+        margin-bottom: 10px;
+    }
+
     .register-header h1 {
         font-size: 24px;
+    }
+}
+/* =========================
+   SHARED MOVIE LOGO
+========================= */
+
+.register-logo {
+    width: 110px;
+    height: 110px;
+    margin: 0 auto 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+}
+
+.register-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+@media (max-width: 500px) {
+    .register-logo {
+        width: 90px;
+        height: 90px;
+        margin-bottom: 10px;
     }
 }

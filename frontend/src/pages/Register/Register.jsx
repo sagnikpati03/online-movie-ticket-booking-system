@@ -1,14 +1,22 @@
 import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import "./Register.css";
+import logo from "../../pictures/logo.png";
+import { API_URL } from "../../config/api";
 
 function Register() {
+    const navigate = useNavigate();
+
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setError("");
 
         const form = e.currentTarget;
 
@@ -18,11 +26,50 @@ function Register() {
         }
 
         if (password !== confirmPassword) {
-            alert("Passwords do not match.");
+            setError("Passwords do not match.");
             return;
         }
 
-        console.log("Registration form submitted");
+        setLoading(true);
+
+        try {
+            const response = await fetch(
+                `${API_URL}/api/auth/register`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        name: form.name.value.trim(),
+                        email: form.email.value.trim(),
+                        phone: form.phone.value.trim(),
+                        password
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setError(data.message || "Registration failed.");
+                return;
+            }
+
+            navigate("/login", {
+                replace: true,
+                state: {
+                    message: "Registration successful. Please login."
+                }
+            });
+        } catch (error) {
+            console.error("Registration error:", error);
+            setError(
+                "Cannot connect to the server. Make sure the backend is running on port 5000."
+            );
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -30,28 +77,23 @@ function Register() {
 
             <div className="register-card">
 
-                {/* Header */}
+                <div className="register-logo">
+                    <img
+                        src={logo}
+                        alt="Movie Ticket Booking"
+                    />
+                </div>
+
                 <div className="register-header">
-
-                    <div className="logo-circle">
-                        🎬
-                    </div>
-
                     <h1>Create Account</h1>
-
                     <p>
                         Register to book your movie tickets
                     </p>
-
                 </div>
 
-
-                {/* Registration Form */}
                 <form onSubmit={handleSubmit}>
 
-                    {/* Full Name */}
                     <div className="form-group">
-
                         <label htmlFor="name">
                             Full Name
                         </label>
@@ -66,13 +108,9 @@ function Register() {
                             maxLength={100}
                             autoComplete="name"
                         />
-
                     </div>
 
-
-                    {/* Email */}
                     <div className="form-group">
-
                         <label htmlFor="email">
                             Email Address
                         </label>
@@ -86,13 +124,9 @@ function Register() {
                             maxLength={100}
                             autoComplete="email"
                         />
-
                     </div>
 
-
-                    {/* Phone */}
                     <div className="form-group">
-
                         <label htmlFor="phone">
                             Phone Number
                         </label>
@@ -112,68 +146,47 @@ function Register() {
                         <small className="field-hint">
                             Enter a 10-digit phone number.
                         </small>
-
                     </div>
 
-
-                    {/* Password */}
                     <div className="form-group">
-
                         <label htmlFor="password">
                             Password
                         </label>
 
                         <div className="password-wrapper">
-
                             <input
                                 id="password"
                                 name="password"
-                                type={
-                                    showPassword
-                                        ? "text"
-                                        : "password"
-                                }
+                                type={showPassword ? "text" : "password"}
                                 placeholder="Create a password"
                                 minLength={8}
                                 maxLength={100}
                                 required
                                 value={password}
-                                onChange={(e) =>
-                                    setPassword(e.target.value)
-                                }
+                                onChange={(e) => setPassword(e.target.value)}
                                 autoComplete="new-password"
                             />
 
                             <button
                                 type="button"
                                 className="password-toggle"
-                                onClick={() =>
-                                    setShowPassword(
-                                        !showPassword
-                                    )
-                                }
+                                onClick={() => setShowPassword(!showPassword)}
                             >
                                 {showPassword ? "Hide" : "Show"}
                             </button>
-
                         </div>
 
                         <small className="field-hint">
                             Password must be at least 8 characters.
                         </small>
-
                     </div>
 
-
-                    {/* Confirm Password */}
                     <div className="form-group">
-
                         <label htmlFor="confirmPassword">
                             Confirm Password
                         </label>
 
                         <div className="password-wrapper">
-
                             <input
                                 id="confirmPassword"
                                 name="confirmPassword"
@@ -188,9 +201,7 @@ function Register() {
                                 required
                                 value={confirmPassword}
                                 onChange={(e) =>
-                                    setConfirmPassword(
-                                        e.target.value
-                                    )
+                                    setConfirmPassword(e.target.value)
                                 }
                                 autoComplete="new-password"
                             />
@@ -204,42 +215,39 @@ function Register() {
                                     )
                                 }
                             >
-                                {showConfirmPassword
-                                    ? "Hide"
-                                    : "Show"}
+                                {showConfirmPassword ? "Hide" : "Show"}
                             </button>
-
                         </div>
-
                     </div>
 
+                    {error && (
+                        <div className="register-error">
+                            {error}
+                        </div>
+                    )}
 
-                    {/* Register Button */}
                     <button
                         type="submit"
                         className="register-button"
+                        disabled={loading}
                     >
-                        Create Account
+                        {loading
+                            ? "Creating Account..."
+                            : "Create Account"}
                     </button>
-
                 </form>
 
-
-                {/* Login Link */}
                 <div className="login-link">
-
                     <span>
                         Already have an account?
                     </span>
 
-                    <a href="/login">
+                    <Link to="/login">
                         Login
-                    </a>
-
+                    </Link>
                 </div>
 
             </div>
-
         </div>
     );
 }
