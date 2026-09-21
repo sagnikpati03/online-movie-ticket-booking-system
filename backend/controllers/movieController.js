@@ -1,6 +1,7 @@
 const {
     getMovies,
-    getMovieById
+    getMovieById,
+    getShowsForMovie
 } = require("../models/movieModel");
 
 
@@ -112,8 +113,47 @@ async function movieDetails(req, res) {
     }
 }
 
+/* =========================
+   SHOWS FOR MOVIE
+   GET /api/movies/:id/shows
+========================= */
+
+async function movieShows(req, res) {
+    try {
+        const id = Number(req.params.id);
+
+        if (!Number.isInteger(id) || id <= 0) {
+            return res.status(400).json({
+                message: "Invalid movie ID."
+            });
+        }
+
+        const movie = await getMovieById(id);
+
+        if (!movie) {
+            return res.status(404).json({
+                message: "Movie not found."
+            });
+        }
+
+        const shows = await getShowsForMovie(id);
+
+        return res.status(200).json({
+            movie,
+            shows
+        });
+    } catch (error) {
+        console.error("MOVIE SHOWS ERROR:", error);
+
+        return res.status(500).json({
+            message: "Unable to fetch movie shows."
+        });
+    }
+}
+
 
 module.exports = {
     listMovies,
-    movieDetails
+    movieDetails,
+    movieShows
 };

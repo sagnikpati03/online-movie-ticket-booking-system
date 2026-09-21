@@ -282,7 +282,7 @@ function Home() {
 
                                     <button
                                         type="button"
-                                        onClick={() => navigate(`/movie/${movie.id}`)}
+                                        onClick={() => navigate(`/movie-details/${movie.id}`)}
                                     >
                                         View Movie
                                     </button>

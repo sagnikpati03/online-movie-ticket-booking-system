@@ -2,24 +2,16 @@ const express = require("express");
 
 const {
     listMovies,
-    movieDetails
+    movieDetails,
+    movieShows
 } = require("../controllers/movieController");
 
+const router = express.Router();
 
-const router =
-    express.Router();
+router.get("/", listMovies);
 
+router.get("/:id/shows", movieShows);
 
-router.get(
-    "/",
-    listMovies
-);
-
-
-router.get(
-    "/:id",
-    movieDetails
-);
-
+router.get("/:id", movieDetails);
 
 module.exports = router;

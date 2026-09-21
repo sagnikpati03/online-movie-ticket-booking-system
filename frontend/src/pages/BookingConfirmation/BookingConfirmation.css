@@ -1,0 +1,686 @@
+/* =========================
+   GLOBAL
+========================= */
+
+.confirmation-page {
+    min-height: 100vh;
+    background:
+        radial-gradient(
+            circle at 0% 0%,
+            rgba(170, 30, 50, 0.18),
+            transparent 40%
+        ),
+        radial-gradient(
+            circle at 100% 100%,
+            rgba(150, 25, 45, 0.15),
+            transparent 40%
+        ),
+        linear-gradient(
+            135deg,
+            #f7e3e6 0%,
+            #fafafa 48%,
+            #f5dfe2 100%
+        );
+
+    color: #222222;
+}
+
+
+/* =========================
+   NAVBAR
+========================= */
+
+.confirmation-navbar {
+    height: 76px;
+
+    padding: 0 7%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #eeeeee;
+
+    box-shadow:
+        0 3px 15px rgba(0, 0, 0, 0.05);
+}
+
+
+/* =========================
+   LOGO
+========================= */
+
+.confirmation-logo {
+    height: 58px;
+
+    display: flex;
+    align-items: center;
+
+    cursor: pointer;
+}
+
+.confirmation-logo img {
+    width: 95px;
+    height: 58px;
+
+    object-fit: contain;
+}
+
+
+/* =========================
+   NAVIGATION
+========================= */
+
+.confirmation-navbar nav {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.confirmation-navbar nav button {
+    border: none;
+    background: transparent;
+
+    color: #333333;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.confirmation-navbar nav button:hover {
+    color: #9b1d32;
+}
+
+.confirmation-navbar .confirmation-logout {
+    color: #9b1d32;
+}
+
+
+/* =========================
+   MAIN
+========================= */
+
+.confirmation-container {
+    width: 100%;
+    max-width: 850px;
+
+    margin: 0 auto;
+
+    padding: 55px 25px 70px;
+}
+
+
+/* =========================
+   SUCCESS
+========================= */
+
+.success-section {
+    text-align: center;
+
+    margin-bottom: 35px;
+}
+
+.success-icon {
+    width: 70px;
+    height: 70px;
+
+    margin: 0 auto 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #9b1d32;
+
+    color: #ffffff;
+
+    font-size: 38px;
+    font-weight: 700;
+
+    box-shadow:
+        0 8px 25px rgba(155, 29, 50, 0.25);
+}
+
+.success-section h1 {
+    margin: 0 0 8px;
+
+    color: #222222;
+
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.success-section p {
+    margin: 0;
+
+    color: #777777;
+
+    font-size: 15px;
+}
+
+
+/* =========================
+   BOOKING NUMBER
+========================= */
+
+.booking-number {
+    width: fit-content;
+
+    margin: 20px auto 0;
+
+    padding: 10px 20px;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    border: 1px solid #eeeeee;
+
+    box-shadow:
+        0 5px 20px rgba(0, 0, 0, 0.06);
+}
+
+.booking-number span {
+    color: #777777;
+
+    font-size: 12px;
+}
+
+.booking-number strong {
+    color: #9b1d32;
+
+    font-size: 14px;
+}
+
+
+/* =========================
+   TICKET CARD
+========================= */
+
+.ticket-card {
+    background: #ffffff;
+
+    border: 1px solid #eeeeee;
+
+    border-radius: 18px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 15px 40px rgba(0, 0, 0, 0.10);
+}
+
+
+/* =========================
+   TICKET HEADER
+========================= */
+
+.ticket-header {
+    padding: 25px 30px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    border-bottom: 1px solid #eeeeee;
+}
+
+.ticket-label {
+    color: #9b1d32;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: 1.5px;
+}
+
+.ticket-header h2 {
+    margin: 5px 0 0;
+
+    color: #222222;
+
+    font-size: 24px;
+}
+
+.ticket-logo {
+    width: 80px;
+    height: 55px;
+
+    object-fit: contain;
+}
+
+
+/* =========================
+   TICKET BODY
+========================= */
+
+.ticket-body {
+    padding: 30px;
+
+    display: flex;
+    gap: 30px;
+}
+
+
+/* =========================
+   MOVIE POSTER
+========================= */
+
+.movie-poster-container {
+    width: 170px;
+
+    flex-shrink: 0;
+}
+
+.movie-poster {
+    width: 170px;
+    height: 235px;
+
+    display: block;
+
+    object-fit: cover;
+
+    border-radius: 10px;
+}
+
+.poster-placeholder {
+    width: 170px;
+    height: 235px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: #f4dfe2;
+
+    color: #9b1d32;
+
+    font-size: 55px;
+}
+
+
+/* =========================
+   DETAILS
+========================= */
+
+.ticket-details {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 20px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+.detail-item span {
+    color: #888888;
+
+    font-size: 12px;
+}
+
+.detail-item strong {
+    color: #222222;
+
+    font-size: 15px;
+}
+
+.detail-row {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 25px;
+}
+
+.seat-value {
+    color: #9b1d32 !important;
+}
+
+
+/* =========================
+   DIVIDER
+========================= */
+
+.ticket-divider {
+    position: relative;
+
+    height: 1px;
+
+    margin: 0 30px;
+
+    border-top: 1px dashed #d8d8d8;
+}
+
+.ticket-divider span {
+    position: absolute;
+
+    width: 24px;
+    height: 24px;
+
+    top: -13px;
+
+    border-radius: 50%;
+
+    background: #f5e0e3;
+}
+
+.ticket-divider span:first-child {
+    left: -43px;
+}
+
+.ticket-divider span:last-child {
+    right: -43px;
+}
+
+
+/* =========================
+   PAYMENT SUMMARY
+========================= */
+
+.payment-summary {
+    padding: 25px 30px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    background: #fffafa;
+}
+
+.payment-summary > div {
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+.payment-summary span {
+    color: #888888;
+
+    font-size: 12px;
+}
+
+.payment-summary strong {
+    color: #222222;
+
+    font-size: 15px;
+}
+
+.payment-summary .total-price {
+    text-align: right;
+}
+
+.total-price strong {
+    color: #9b1d32;
+
+    font-size: 22px;
+}
+
+
+/* =========================
+   ACTIONS
+========================= */
+
+.confirmation-actions {
+    margin-top: 30px;
+
+    display: flex;
+    justify-content: center;
+
+    gap: 12px;
+
+    flex-wrap: wrap;
+}
+
+.confirmation-actions button {
+    height: 46px;
+
+    padding: 0 22px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.primary-action {
+    border: none;
+
+    background: #9b1d32;
+
+    color: #ffffff;
+}
+
+.primary-action:hover {
+    background: #7e1728;
+}
+
+.secondary-action {
+    border: 1px solid #9b1d32;
+
+    background: #ffffff;
+
+    color: #9b1d32;
+}
+
+.secondary-action:hover {
+    background: #f9e8ea;
+}
+
+
+/* =========================
+   NOTE
+========================= */
+
+.confirmation-note {
+    margin-top: 22px;
+
+    text-align: center;
+
+    color: #888888;
+
+    font-size: 12px;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 650px) {
+
+    .confirmation-navbar {
+        padding: 0 20px;
+    }
+
+    .confirmation-navbar nav {
+        gap: 12px;
+    }
+
+    .confirmation-navbar nav button {
+        font-size: 12px;
+    }
+
+    .confirmation-container {
+        padding: 35px 15px 50px;
+    }
+
+    .success-section h1 {
+        font-size: 27px;
+    }
+
+    .ticket-header {
+        padding: 20px;
+    }
+
+    .ticket-header h2 {
+        font-size: 20px;
+    }
+
+    .ticket-body {
+        padding: 20px;
+
+        flex-direction: column;
+    }
+
+    .movie-poster-container {
+        width: 100%;
+
+        display: flex;
+        justify-content: center;
+    }
+
+    .payment-summary {
+        padding: 20px;
+
+        flex-direction: column;
+        align-items: stretch;
+
+        gap: 18px;
+    }
+
+    .payment-summary .total-price {
+        text-align: left;
+    }
+
+    .detail-row {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .ticket-divider {
+        margin: 0 20px;
+    }
+
+    .ticket-divider span:first-child {
+        left: -33px;
+    }
+
+    .ticket-divider span:last-child {
+        right: -33px;
+    }
+
+}
+
+
+/* =========================
+   PRINT
+========================= */
+
+@media print {
+
+    .confirmation-navbar,
+    .confirmation-actions,
+    .confirmation-note {
+        display: none;
+    }
+
+    .confirmation-page {
+        background: #ffffff;
+    }
+
+    .confirmation-container {
+        padding: 20px;
+        max-width: 900px;
+    }
+
+    .ticket-card {
+        box-shadow: none;
+        border: 1px solid #cccccc;
+    }
+
+}
+
+.confirmation-loading {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #777777;
+}
+
+.confirmation-loading .loading-spinner {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 15px;
+    border: 4px solid #ead0d4;
+    border-top-color: #9b1d32;
+    border-radius: 50%;
+    animation: confirmationSpinner 0.8s linear infinite;
+}
+
+@keyframes confirmationSpinner {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.confirmation-error {
+    width: 100%;
+    max-width: 520px;
+    margin: 100px auto;
+    padding: 40px 30px;
+    text-align: center;
+    background: #ffffff;
+    border: 1px solid #eeeeee;
+    border-radius: 16px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.10);
+}
+
+.confirmation-error h2 {
+    margin: 0 0 8px;
+    color: #222222;
+}
+
+.confirmation-error p {
+    margin: 0 0 22px;
+    color: #777777;
+    font-size: 14px;
+}
+
+.confirmation-error button {
+    height: 45px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 8px;
+    background: #9b1d32;
+    color: #ffffff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.confirmation-error button:hover {
+    background: #7e1728;
+}
+
+@media (max-width: 650px) {
+    .confirmation-navbar nav {
+        gap: 10px;
+    }
+
+    .confirmation-navbar nav button {
+        font-size: 12px;
+    }
+}

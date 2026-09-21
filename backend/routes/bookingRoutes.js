@@ -1,7 +1,9 @@
 const express = require("express");
 
 const {
+    create,
     myBookings,
+    getOne,
     allBookings
 } = require("../controllers/bookingController");
 
@@ -11,6 +13,12 @@ const {
 } = require("../middleware/authMiddleware");
 
 const router = express.Router();
+
+router.post(
+    "/",
+    authenticateToken,
+    create
+);
 
 router.get(
     "/my",
@@ -23,6 +31,12 @@ router.get(
     authenticateToken,
     requireAdmin,
     allBookings
+);
+
+router.get(
+    "/:id",
+    authenticateToken,
+    getOne
 );
 
 module.exports = router;

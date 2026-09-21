@@ -5,11 +5,14 @@ import {
     Navigate
 } from "react-router-dom";
 
+
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import Home from "./pages/Home/Home";
 import MyBookings from "./pages/MyBookings/MyBookings";
 import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
+import BookingConfirmation from "./pages/BookingConfirmation/BookingConfirmation";
+import MovieDetails from "./pages/MovieDetails/MovieDetails";
 
 function ProtectedRoute({ children }) {
     const token = localStorage.getItem("token");
@@ -56,6 +59,35 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
+
+                <Route
+                    path="/booking-confirmation/:bookingId"
+                    element={
+                        <ProtectedRoute>
+                            <BookingConfirmation />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/booking-confirmation"
+                    element={
+                        <ProtectedRoute>
+                            <BookingConfirmation />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/movie-details/:movieId"
+                    element={
+                        <ProtectedRoute>
+                            <MovieDetails />
+                        </ProtectedRoute>
+                    }
+                />
+
+               
 
                 <Route
                     path="/my-bookings"

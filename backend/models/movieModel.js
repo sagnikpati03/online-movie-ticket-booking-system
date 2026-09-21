@@ -118,7 +118,36 @@ async function getMovieById(id) {
 }
 
 
+async function getShowsForMovie(movieId) {
+    const [rows] = await db.execute(`
+        SELECT
+            s.id,
+            s.movie_id,
+            s.theatre_id,
+            s.screen_id,
+            s.show_date,
+            s.start_time,
+            s.end_time,
+            s.base_price,
+            s.status,
+            t.name AS theatre_name,
+            t.city,
+            sc.name AS screen_name
+        FROM shows s
+        INNER JOIN theatres t ON t.id = s.theatre_id
+        INNER JOIN screens sc ON sc.id = s.screen_id
+        WHERE s.movie_id = ?
+          AND s.status = 'active'
+          AND t.id = s.theatre_id
+          AND sc.id = s.screen_id
+        ORDER BY s.show_date ASC, s.start_time ASC
+    `, [movieId]);
+
+    return rows;
+}
+
 module.exports = {
     getMovies,
-    getMovieById
+    getMovieById,
+    getShowsForMovie
 };
