@@ -292,7 +292,7 @@ function Home() {
                     </div>
                 ) : (
                     <div className="no-results">
-                        <div className="no-results-icon">🔍</div>
+                        <div className="no-results-icon"></div>
                         <h3>
                             {searched ? "No movies found" : "No movies available"}
                         </h3>
