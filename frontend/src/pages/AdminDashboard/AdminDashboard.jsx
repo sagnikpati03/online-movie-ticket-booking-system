@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "./AdminDashboard.css";
 import logo from "../../pictures/logo.png";
 import { API_URL } from "../../config/api";
+import { formatDisplayDate, getPosterUrl } from "../../utils/display";
 
 const emptyMovie = {
     title: "", description: "", genre: "", language: "", duration_minutes: "",
@@ -40,12 +41,15 @@ function AdminDashboard() {
     const [show, setShow] = useState(emptyShow);
 
     const token = localStorage.getItem("token");
-    const headers = { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
 
     const api = async (path, options = {}) => {
         const response = await fetch(`${API_URL}${path}`, {
             ...options,
-            headers: { ...headers, ...(options.headers || {}) }
+            headers: {
+                ...(options.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                ...(options.headers || {})
+            }
         });
         const body = await response.json().catch(() => ({}));
         if (response.status === 401) {
@@ -105,7 +109,7 @@ function AdminDashboard() {
         try {
             const result = await api(path, {
                 method,
-                body: JSON.stringify(body)
+                body: body instanceof FormData ? body : JSON.stringify(body)
             });
             flash(result.message || "Saved successfully.");
             reset();
@@ -114,6 +118,21 @@ function AdminDashboard() {
         } catch (e) {
             setError(e.message);
         }
+    };
+
+    const saveMovie = async () => {
+        const formData = new FormData();
+        Object.entries(movie).forEach(([key, value]) => {
+            if (key === "posterFile" || value === undefined || value === null) return;
+            formData.append(key, String(value));
+        });
+        if (movie.posterFile) formData.append("poster", movie.posterFile);
+        await save(
+            editing === "movie" ? `/api/admin/movies/${movie.id}` : "/api/admin/movies",
+            editing === "movie" ? "PUT" : "POST",
+            formData,
+            () => setMovie(emptyMovie)
+        );
     };
 
     const remove = async (path, message) => {
@@ -304,18 +323,18 @@ function AdminDashboard() {
                         <MovieForm
                             value={movie} setValue={setMovie}
                             editing={editing === "movie"}
-                            onSubmit={() => save(editing === "movie" ? `/api/admin/movies/${movie.id}` : "/api/admin/movies", editing === "movie" ? "PUT" : "POST", movie, () => setMovie(emptyMovie))}
+                            onSubmit={saveMovie}
                             onCancel={resetAll}
                         />
                         <Table>
-                            <thead><tr><th>Movie</th><th>Genre</th><th>Language</th><th>Duration</th><th>Status</th><th>Actions</th></tr></thead>
+                            <thead><tr><th>Poster</th><th>Movie</th><th>Genre</th><th>Language</th><th>Duration</th><th>Status</th><th>Actions</th></tr></thead>
                             <tbody>{data.movies.map(m => (
-                                <tr key={m.id}><td><strong>{m.title}</strong><small>{m.director || "No director"}</small></td>
+                                <tr key={m.id}><td>{m.poster_url ? <img className="admin-movie-thumb" src={getPosterUrl(m.poster_url)} alt={`${m.title} poster`} /> : <span className="admin-no-thumb">🎬</span>}</td><td><strong>{m.title}</strong><small>{m.director || "No director"}</small></td>
                                     <td>{m.genre || "-"}</td><td>{m.language || "-"}</td><td>{m.duration_minutes} min</td>
                                     <td><span className={`status-badge ${m.status}`}>{m.status}</span></td>
                                     <td className="actions">
-                                        <button onClick={() => { setMovie({...m, release_date: m.release_date ? String(m.release_date).slice(0,10) : ""}); setEditing("movie"); window.scrollTo({top:0,behavior:"smooth"}); }}>Edit</button>
-                                        {m.status === "active" && <button className="danger" onClick={() => remove(`/api/admin/movies/${m.id}`, `Deactivate ${m.title}?`)}>Deactivate</button>}
+                                        <button onClick={() => { setMovie({...m, release_date: m.release_date ? String(m.release_date).slice(0,10) : "", posterFile: null}); setEditing("movie"); window.scrollTo({top:0,behavior:"smooth"}); }}>Edit</button>
+                                        {m.status === "active" && <button className="danger" onClick={() => remove(`/api/admin/movies/${m.id}`, `Remove ${m.title} from the active movie list? It will be deactivated, not permanently erased.`)}>Delete</button>}
                                     </td>
                                 </tr>
                             ))}</tbody>
@@ -356,9 +375,29 @@ function AdminDashboard() {
 
                 {tab === "seats" && (
                     <ManagementPanel title="Seat Management" subtitle="Create, price and activate individual seats.">
-                        <SeatForm value={seat} setValue={setSeat} screens={data.screens}
+                        <SeatForm value={seat} setValue={setSeat} screens={data.screens} seats={data.seats}
                             editing={editing === "seat"}
-                            onSubmit={() => save(editing === "seat" ? `/api/admin/seats/${seat.id}` : "/api/admin/seats", editing === "seat" ? "PUT":"POST", seat, () => setSeat(emptySeat))}
+                            onSubmit={async (payload) => {
+                                if (Array.isArray(payload)) {
+                                    const selectedScreen = String(payload[0]?.screen_id || "");
+                                    const existing = new Set(data.seats.filter(s => String(s.screen_id) === selectedScreen).map(s => String(s.seat_number).toUpperCase()));
+                                    const toCreate = payload.filter(item => !existing.has(String(item.seat_number).toUpperCase()));
+                                    if (!toCreate.length) { setError("All selected seats already exist for this screen."); return; }
+                                    let created = 0;
+                                    const failures = [];
+                                    for (const item of toCreate) {
+                                        try {
+                                            await api("/api/admin/seats", { method: "POST", body: JSON.stringify(item) });
+                                            created += 1;
+                                        } catch (e) { failures.push(`${item.seat_number}: ${e.message}`); }
+                                    }
+                                    if (created) flash(`${created} seat${created === 1 ? "" : "s"} added successfully.`);
+                                    if (failures.length) setError(`Some seats could not be added: ${failures.slice(0, 4).join("; ")}`);
+                                    setEditing(null); setSeat(emptySeat); await load();
+                                } else {
+                                    await save(editing === "seat" ? `/api/admin/seats/${seat.id}` : "/api/admin/seats", editing === "seat" ? "PUT":"POST", payload, () => setSeat(emptySeat));
+                                }
+                            }}
                             onCancel={resetAll}/>
                         <Table><thead><tr><th>Seat</th><th>Screen</th><th>Theatre</th><th>Type</th><th>Multiplier</th><th>Active</th><th>Actions</th></tr></thead>
                             <tbody>{data.seats.map(s => <tr key={s.id}><td><strong>{s.seat_number}</strong></td><td>{s.screen_name}</td><td>{s.theatre_name}</td><td>{s.seat_type}</td><td>{Number(s.price_multiplier).toFixed(2)}×</td><td>{s.is_active ? "Yes":"No"}</td><td className="actions">
@@ -430,13 +469,40 @@ function ManagementPanel({title,subtitle,children}) {
 function Table({children}) { return <div className="admin-table-wrap"><table className="admin-table">{children}</table></div>; }
 
 function MovieForm({value,setValue,editing,onSubmit,onCancel}) {
-    const f = (key,label,type="text") => <label><span>{label}</span><input type={type} value={value[key] ?? ""} onChange={e=>setValue({...value,[key]:e.target.value})} /></label>;
+    const [preview, setPreview] = useState("");
+    useEffect(() => {
+        if (value.posterFile) {
+            const objectUrl = URL.createObjectURL(value.posterFile);
+            setPreview(objectUrl);
+            return () => URL.revokeObjectURL(objectUrl);
+        }
+        const poster = value.poster_url || "";
+        setPreview(getPosterUrl(poster));
+    }, [value.posterFile, value.poster_url]);
+
+    const f = (key,label,type="text") => <label key={key}><span>{label}</span><input type={type} value={value[key] ?? ""} onChange={e=>setValue({...value,[key]:e.target.value})} /></label>;
+    const choosePoster = (file) => {
+        if (!file) return;
+        if (!file.type.startsWith("image/")) {
+            window.alert("Please select an image file (PNG, JPG, or WEBP).");
+            return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            window.alert("Poster image must be 5 MB or smaller.");
+            return;
+        }
+        setValue({...value, posterFile:file});
+    };
+
     return <div className="entity-form wide"><div className="form-title">{editing?"Edit Movie":"Add Movie"}</div>
         <div className="form-grid">
             {f("title","Title *")}{f("genre","Genre")}{f("language","Language")}{f("duration_minutes","Duration (minutes)","number")}
             {f("release_date","Release Date","date")}{f("certificate","Certificate")}{f("director","Director")}
-            {f("poster_url","Poster URL")}{f("trailer_url","Trailer URL")}
-            <label><span>Status</span><select value={value.status} onChange={e=>setValue({...value,status:e.target.value})}><option value="active">Active</option><option value="inactive">Inactive</option></select></label>
+            {f("trailer_url","Trailer URL")}
+            <label><span>Poster Image (16:9, max 5 MB)</span><input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={e=>choosePoster(e.target.files?.[0])}/><small>Choose a poster from your computer. It will be saved on the backend.</small></label>
+            <label><span>Or Poster URL</span><input type="url" value={value.poster_url ?? ""} placeholder="https://..." onChange={e=>setValue({...value,poster_url:e.target.value,posterFile:null})}/></label>
+            {preview && <div className="poster-preview-wrap"><span>Poster preview</span><img className="admin-poster-preview" src={preview} alt="Movie poster preview" onError={()=>setPreview("")}/></div>}
+            <label><span>Status</span><select value={value.status || "active"} onChange={e=>setValue({...value,status:e.target.value})}><option value="active">Active</option><option value="inactive">Inactive</option></select></label>
             {f("cast","Cast")}
             <label className="span-2"><span>Description</span><textarea rows="3" value={value.description ?? ""} onChange={e=>setValue({...value,description:e.target.value})}/></label>
         </div><FormButtons editing={editing} onSubmit={onSubmit} onCancel={onCancel}/>
@@ -456,14 +522,80 @@ function ScreenForm({value,setValue,theatres,editing,onSubmit,onCancel}) {
     </div><FormButtons editing={editing} onSubmit={onSubmit} onCancel={onCancel}/></div>;
 }
 
-function SeatForm({value,setValue,screens,editing,onSubmit,onCancel}) {
-    return <div className="entity-form"><div className="form-title">{editing?"Edit Seat":"Add Seat"}</div><div className="form-grid">
-        <label><span>Screen</span><select value={value.screen_id ?? ""} onChange={e=>setValue({...value,screen_id:e.target.value})} required><option value="">Select screen</option>{screens.map(s=><option key={s.id} value={s.id}>{s.theatre_name} / {s.name}</option>)}</select></label>
-        <label><span>Seat Number</span><input value={value.seat_number ?? ""} onChange={e=>setValue({...value,seat_number:e.target.value.toUpperCase()})} required /></label>
-        <label><span>Seat Type</span><select value={value.seat_type} onChange={e=>setValue({...value,seat_type:e.target.value})}><option value="regular">Regular</option><option value="premium">Premium</option><option value="vip">VIP</option></select></label>
-        <label><span>Price Multiplier</span><input type="number" step="0.01" min="0.01" value={value.price_multiplier} onChange={e=>setValue({...value,price_multiplier:e.target.value})}/></label>
-        <label className="checkbox"><input type="checkbox" checked={Boolean(value.is_active)} onChange={e=>setValue({...value,is_active:e.target.checked})}/><span>Seat active</span></label>
-    </div><FormButtons editing={editing} onSubmit={onSubmit} onCancel={onCancel}/></div>;
+function SeatForm({value,setValue,screens,seats=[],editing,onSubmit,onCancel}) {
+    const [rows, setRows] = useState(5);
+    const [columns, setColumns] = useState(10);
+    const [firstRow, setFirstRow] = useState("A");
+    const [selected, setSelected] = useState(() => new Set());
+
+    const rowLabels = useMemo(() => {
+        const start = Math.max(0, (String(firstRow || "A").toUpperCase().charCodeAt(0) || 65) - 65);
+        return Array.from({length: Math.max(1, Math.min(26, Number(rows) || 1))}, (_, i) => String.fromCharCode(65 + ((start + i) % 26)));
+    }, [rows, firstRow]);
+    const existing = useMemo(() => new Set(seats
+        .filter(item => String(item.screen_id) === String(value.screen_id))
+        .map(item => String(item.seat_number).toUpperCase())), [seats, value.screen_id]);
+
+    const seatNames = rowLabels.flatMap(row => Array.from({length: Math.max(1, Math.min(40, Number(columns) || 1))}, (_, i) => `${row}${i + 1}`));
+    const availableNames = seatNames.filter(name => !existing.has(name));
+    const toggleSeat = (name) => setSelected(current => {
+        const next = new Set(current);
+        next.has(name) ? next.delete(name) : next.add(name);
+        return next;
+    });
+    const selectAll = () => setSelected(new Set(availableNames));
+    const clearSelection = () => setSelected(new Set());
+    const submitBulk = () => {
+        if (!value.screen_id) { window.alert("Please select a screen first."); return; }
+        const chosen = [...selected].filter(name => seatNames.includes(name) && !existing.has(name));
+        if (!chosen.length) { window.alert("Select at least one new seat in the layout."); return; }
+        onSubmit(chosen.map(seat_number => ({
+            screen_id: Number(value.screen_id), seat_number, seat_type: value.seat_type,
+            price_multiplier: Number(value.price_multiplier || 1), is_active: Boolean(value.is_active)
+        })));
+    };
+
+    return <>
+        <div className="entity-form">
+            <div className="form-title">{editing ? "Edit Seat" : "Add Individual Seat"}</div>
+            <div className="form-grid">
+                <label><span>Screen</span><select value={value.screen_id ?? ""} onChange={e=>{setSelected(new Set());setValue({...value,screen_id:e.target.value});}} required><option value="">Select screen</option>{screens.map(s=><option key={s.id} value={s.id}>{s.theatre_name} / {s.name}</option>)}</select></label>
+                {editing && <label><span>Seat Number</span><input value={value.seat_number ?? ""} onChange={e=>setValue({...value,seat_number:e.target.value.toUpperCase()})} required /></label>}
+                <label><span>Seat Type</span><select value={value.seat_type} onChange={e=>setValue({...value,seat_type:e.target.value})}><option value="regular">Regular</option><option value="premium">Premium</option><option value="vip">VIP</option></select></label>
+                <label><span>Price Multiplier</span><input type="number" step="0.01" min="0.01" value={value.price_multiplier} onChange={e=>setValue({...value,price_multiplier:e.target.value})}/></label>
+                <label className="checkbox"><input type="checkbox" checked={Boolean(value.is_active)} onChange={e=>setValue({...value,is_active:e.target.checked})}/><span>Seat active</span></label>
+            </div>
+            {editing ? <FormButtons editing onSubmit={() => onSubmit(value)} onCancel={onCancel}/> : null}
+        </div>
+        {!editing && <section className="seat-builder">
+            <h3 className="seat-builder-title">Visual Seat Layout Builder</h3>
+            <div className="seat-builder-controls">
+                <label><span>Number of rows</span><input type="number" min="1" max="26" value={rows} onChange={e=>{setSelected(new Set());setRows(Math.max(1,Math.min(26,Number(e.target.value)||1)));}}/></label>
+                <label><span>Seats per row</span><input type="number" min="1" max="40" value={columns} onChange={e=>{setSelected(new Set());setColumns(Math.max(1,Math.min(40,Number(e.target.value)||1)));}}/></label>
+                <label><span>First row label</span><input maxLength="1" value={firstRow} onChange={e=>{setSelected(new Set());setFirstRow((e.target.value || "A").slice(-1).toUpperCase().replace(/[^A-Z]/g,"A"));}}/></label>
+                <label><span>Seat type</span><select value={value.seat_type} onChange={e=>setValue({...value,seat_type:e.target.value})}><option value="regular">Regular</option><option value="premium">Premium</option><option value="vip">VIP</option></select></label>
+                <label><span>Price multiplier</span><input type="number" min="0.01" step="0.01" value={value.price_multiplier} onChange={e=>setValue({...value,price_multiplier:e.target.value})}/></label>
+            </div>
+            <p className="seat-builder-hint">Click seats to select which positions to create. Green seats already exist. Row labels and seat numbers form labels such as A1, A2, B1.</p>
+            <div className="seat-builder-grid-wrap"><div className="seat-builder-grid">
+                {rowLabels.map(row => <div className="seat-builder-row" key={row}>
+                    <span className="seat-builder-row-label">{row}</span>
+                    {Array.from({length: Math.max(1,Math.min(40,Number(columns)||1))},(_,i)=>{
+                        const name=`${row}${i+1}`; const isExisting=existing.has(name); const isSelected=selected.has(name);
+                        return <button type="button" key={name} disabled={isExisting} aria-pressed={isSelected} title={isExisting ? `${name} already exists` : `Toggle seat ${name}`} className={`seat-builder-seat${isExisting ? " existing" : isSelected ? " selected" : ""}`} onClick={()=>toggleSeat(name)}>{name}</button>;
+                    })}
+                </div>)}
+            </div></div>
+            <div className="seat-builder-footer">
+                <strong>{selected.size} selected · {availableNames.length} new positions available</strong>
+                <div className="seat-builder-actions">
+                    <button type="button" onClick={selectAll}>Select all new seats</button>
+                    <button type="button" onClick={clearSelection}>Clear selection</button>
+                    <button type="button" className="primary" onClick={submitBulk}>Create selected seats</button>
+                </div>
+            </div>
+        </section>}
+    </>;
 }
 
 function ShowForm({value,setValue,movies,theatres,screens,editing,onSubmit,onCancel}) {
@@ -495,9 +627,7 @@ function BookingTable({bookings,onStatus,full=false}) {
 }
 
 function formatDate(value) {
-    if (!value) return "-";
-    const d = new Date(value);
-    return Number.isNaN(d.getTime()) ? String(value).slice(0,10) : d.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
+    return formatDisplayDate(value, "-");
 }
 
 export default AdminDashboard;

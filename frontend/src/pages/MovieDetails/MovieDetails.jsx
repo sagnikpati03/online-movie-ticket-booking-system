@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import logo from "../../pictures/logo.png";
 import { API_URL } from "../../config/api";
+import { formatDisplayDate, formatDisplayTime, getPosterUrl } from "../../utils/display";
 import "./MovieDetails.css";
 
 function MovieDetails() {
@@ -68,33 +69,8 @@ function MovieDetails() {
         navigate("/login", { replace: true });
     };
 
-    const formatDate = (value) => {
-        if (!value) return "N/A";
-
-        const date = new Date(`${value}T00:00:00`);
-
-        return date.toLocaleDateString("en-IN", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
-        });
-    };
-
-    const formatTime = (value) => {
-        if (!value) return "N/A";
-
-        const [hourString, minuteString] = String(value)
-            .slice(0, 5)
-            .split(":");
-
-        let hour = Number(hourString);
-        const minute = minuteString || "00";
-        const period = hour >= 12 ? "PM" : "AM";
-
-        hour = hour % 12 || 12;
-
-        return `${hour}:${minute} ${period}`;
-    };
+    const formatDate = (value) => formatDisplayDate(value, "N/A");
+    const formatTime = (value) => formatDisplayTime(value, "N/A");
 
     const handleSelectShow = (show) => {
         // The next step in the booking flow is Seat Selection.
@@ -149,11 +125,10 @@ function MovieDetails() {
         );
     }
 
-    const poster =
-        movie.poster_url || "";
+    const poster = getPosterUrl(movie.poster_url);
 
     return (
-        <div className="movie-details-page">
+        <div className="movie-details-page" style={{ "--movie-backdrop": poster ? `url("${poster}")` : "none" }}>
 
             <header className="movie-details-navbar">
 

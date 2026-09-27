@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "./MyBookings.css";
 import logo from "../../pictures/logo.png";
 import { API_URL } from "../../config/api";
+import { formatDisplayDate, getPosterUrl } from "../../utils/display";
 
 function MyBookings() {
     const navigate = useNavigate();
@@ -57,14 +58,7 @@ function MyBookings() {
         navigate("/login", { replace: true });
     };
 
-    const formatDate = (value) => {
-        if (!value) return "-";
-        return new Date(value).toLocaleDateString("en-IN", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
-        });
-    };
+    const formatDate = (value) => formatDisplayDate(value, "-");
 
     return (
         <div className="bookings-page">
@@ -120,7 +114,7 @@ function MyBookings() {
                             <article className="booking-card" key={booking.id}>
                                 <div className="booking-poster">
                                     {booking.poster_url ? (
-                                        <img src={booking.poster_url} alt={booking.movie_title} />
+                                        <img src={getPosterUrl(booking.poster_url)} alt={booking.movie_title} />
                                     ) : (
                                         <span>🎬</span>
                                     )}

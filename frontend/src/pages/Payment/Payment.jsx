@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import logo from "../../pictures/logo.png";
 import { API_URL } from "../../config/api";
+import { formatDisplayDate, formatDisplayTime, getPosterUrl } from "../../utils/display";
 import "./Payment.css";
 
 function Payment() {
@@ -23,23 +24,9 @@ function Payment() {
         seats.reduce((sum, seat) => sum + Number(seat.price || 0), 0)
     );
 
-    const formatDate = (value) => {
-        if (!value) return "—";
-        return new Date(`${String(value).slice(0, 10)}T00:00:00`).toLocaleDateString("en-IN", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
-        });
-    };
-
-    const formatTime = (value) => {
-        if (!value) return "—";
-        const [hh, mm] = String(value).slice(0, 5).split(":");
-        let hour = Number(hh);
-        const period = hour >= 12 ? "PM" : "AM";
-        hour = hour % 12 || 12;
-        return `${hour}:${mm || "00"} ${period}`;
-    };
+    const formatDate = (value) => formatDisplayDate(value);
+    const formatTime = (value) => formatDisplayTime(value);
+    const poster = getPosterUrl(movie.poster_url);
 
     const handlePayment = async (event) => {
         event.preventDefault();
@@ -125,7 +112,7 @@ function Payment() {
     }
 
     return (
-        <div className="payment-page">
+        <div className="payment-page" style={{ "--movie-backdrop": poster ? `url("${poster}")` : "none" }}>
             <header className="payment-navbar">
                 <button className="payment-logo" onClick={() => navigate("/home")} aria-label="Go home">
                     <img src={logo} alt="Movie Ticket Booking" />
@@ -215,8 +202,8 @@ function Payment() {
                         <h2>Booking summary</h2>
 
                         <div className="payment-movie-summary">
-                            {movie.poster_url ? (
-                                <img src={movie.poster_url} alt={movie.title || "Movie poster"} />
+                            {poster ? (
+                                <img src={poster} alt={movie.title || "Movie poster"} />
                             ) : (
                                 <div className="payment-poster-placeholder">🎬</div>
                             )}

@@ -58,8 +58,26 @@ async function deleteUser(req, res) {
 }
 
 /* MOVIES */
-async function createMovie(req,res){ try { validateMovie(req.body); const movieId=await admin.createMovie(req.body); return res.status(201).json({message:"Movie added successfully.",id:movieId}); } catch(e){return sendError(res,e,"Unable to add movie.");}}
-async function updateMovie(req,res){ try { validateMovie(req.body); const movieId=id(req.params.id); if(!movieId)return res.status(400).json({message:"Invalid movie ID."}); await admin.updateMovie(movieId,req.body); return res.json({message:"Movie updated successfully."}); } catch(e){return sendError(res,e,"Unable to update movie.");}}
+async function createMovie(req,res){
+    try {
+        const data = { ...req.body };
+        if (req.file) data.poster_url = `/uploads/posters/${req.file.filename}`;
+        validateMovie(data);
+        const movieId = await admin.createMovie(data);
+        return res.status(201).json({ message: "Movie added successfully.", id: movieId, poster_url: data.poster_url || null });
+    } catch(e) { return sendError(res,e,"Unable to add movie."); }
+}
+async function updateMovie(req,res){
+    try {
+        const movieId = id(req.params.id);
+        if (!movieId) return res.status(400).json({ message: "Invalid movie ID." });
+        const data = { ...req.body };
+        if (req.file) data.poster_url = `/uploads/posters/${req.file.filename}`;
+        validateMovie(data);
+        await admin.updateMovie(movieId, data);
+        return res.json({ message: "Movie updated successfully.", poster_url: data.poster_url || null });
+    } catch(e) { return sendError(res,e,"Unable to update movie."); }
+}
 async function deleteMovie(req,res){ try {const movieId=id(req.params.id);if(!movieId)return res.status(400).json({message:"Invalid movie ID."});await admin.deleteMovie(movieId);return res.json({message:"Movie set to inactive."});}catch(e){return sendError(res,e,"Unable to remove movie.");}}
 
 function validateMovie(d){

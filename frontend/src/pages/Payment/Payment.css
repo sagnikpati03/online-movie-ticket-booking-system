@@ -362,3 +362,10 @@
         padding: 20px 16px;
     }
 }
+
+/* Glassmorphism + blurred movie backdrop */
+.payment-page { position: relative; isolation: isolate; background: transparent; }
+.payment-page::before { content: ""; position: fixed; inset: 0; z-index: -2; background-image: var(--movie-backdrop); background-size: cover; background-position: center; filter: blur(22px); transform: scale(1.08); opacity: .28; }
+.payment-page::after { content: ""; position: fixed; inset: 0; z-index: -1; background: rgba(248,246,247,.78); pointer-events: none; }
+.payment-navbar, .payment-method-card, .payment-summary-card { background: rgba(255,255,255,.70); border: 1px solid rgba(255,255,255,.76); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); box-shadow: 0 12px 36px rgba(38,20,25,.08); }
+.payment-movie-summary img, .payment-poster-placeholder { width: 150px; height: 84px; object-fit: contain; background: rgba(155,29,50,.08); border-radius: 8px; }

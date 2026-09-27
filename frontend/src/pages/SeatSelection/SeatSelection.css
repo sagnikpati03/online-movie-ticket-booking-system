@@ -391,3 +391,13 @@
         width: 100%;
     }
 }
+
+/* Glassmorphism + blurred movie backdrop */
+.seat-page { position: relative; isolation: isolate; background: transparent; }
+.seat-page::before { content: ""; position: fixed; inset: 0; z-index: -2; background-image: var(--movie-backdrop); background-size: cover; background-position: center; filter: blur(22px); transform: scale(1.08); opacity: .30; }
+.seat-page::after { content: ""; position: fixed; inset: 0; z-index: -1; background: rgba(248, 246, 247, .78); pointer-events: none; }
+.seat-navbar, .seat-layout-card, .seat-bottom-panel { background: rgba(255,255,255,.68); border: 1px solid rgba(255,255,255,.72); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); box-shadow: 0 12px 36px rgba(38, 20, 25, .08); }
+.seat-row-items { display: flex; flex-wrap: nowrap; justify-content: center; gap: 10px; }
+.seat-row { min-width: 0; grid-template-columns: 24px minmax(0, 1fr) 24px; }
+.seat-map { overflow-x: auto; }
+@media (max-width: 700px) { .seat-layout-card { padding: 22px 12px; } .seat-row-items { gap: 6px; } .seat { width: 100%; min-width: 28px; font-size: 9px; } .seat-bottom-panel { flex-wrap: wrap; } }

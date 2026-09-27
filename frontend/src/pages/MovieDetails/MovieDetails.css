@@ -742,3 +742,12 @@
         grid-column: auto;
     }
 }
+
+/* Full poster visibility, glass surfaces, and blurred poster backdrop */
+.movie-details-page { position: relative; isolation: isolate; background: transparent; }
+.movie-details-page::before { content: ""; position: fixed; inset: 0; z-index: -2; background-image: var(--movie-backdrop); background-size: cover; background-position: center; filter: blur(24px); transform: scale(1.08); opacity: .27; }
+.movie-details-page::after { content: ""; position: fixed; inset: 0; z-index: -1; background: rgba(248,246,247,.78); pointer-events: none; }
+.movie-details-navbar, .movie-details-card, .show-card, .no-shows, .movie-info-item { background: rgba(255,255,255,.70); border-color: rgba(255,255,255,.76); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+.movie-poster { width: 100%; height: auto; max-height: 350px; aspect-ratio: 16 / 9; object-fit: contain; background: rgba(20,20,20,.94); }
+.movie-poster-placeholder { width: 100%; height: auto; max-height: 350px; aspect-ratio: 16 / 9; }
+.movie-poster-section { display: flex; align-items: center; }

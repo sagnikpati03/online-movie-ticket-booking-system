@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import logo from "../../pictures/logo.png";
 import { API_URL } from "../../config/api";
+import { formatDisplayDate, formatDisplayTime, getPosterUrl } from "../../utils/display";
 import "./SeatSelection.css";
 
 function SeatSelection() {
@@ -84,13 +85,22 @@ function SeatSelection() {
 
     const seatRows = useMemo(() => {
         const rows = new Map();
+        const hasLetterRows = sortedSeats.some((seat) => /^[A-Za-z]+/.test(String(seat.seat_number || "")));
 
-        sortedSeats.forEach((seat) => {
-            const rowName = String(seat.seat_number || "").match(/^[A-Za-z]+/)?.[0] || "Other";
-            if (!rows.has(rowName)) rows.set(rowName, []);
-            rows.get(rowName).push(seat);
-        });
-
+        if (hasLetterRows) {
+            sortedSeats.forEach((seat) => {
+                const rowName = String(seat.seat_number || "").match(/^[A-Za-z]+/)?.[0] || "Other";
+                if (!rows.has(rowName)) rows.set(rowName, []);
+                rows.get(rowName).push(seat);
+            });
+        } else {
+            // Numeric-only seat labels are split into rows of 4 instead of one long line.
+            sortedSeats.forEach((seat, index) => {
+                const rowName = String.fromCharCode(65 + Math.floor(index / 4));
+                if (!rows.has(rowName)) rows.set(rowName, []);
+                rows.get(rowName).push(seat);
+            });
+        }
         return Array.from(rows.entries());
     }, [sortedSeats]);
 
@@ -132,24 +142,9 @@ function SeatSelection() {
         });
     };
 
-    const formatDate = (value) => {
-        if (!value) return "—";
-        const date = new Date(`${String(value).slice(0, 10)}T00:00:00`);
-        return date.toLocaleDateString("en-IN", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
-        });
-    };
-
-    const formatTime = (value) => {
-        if (!value) return "—";
-        const [hh, mm] = String(value).slice(0, 5).split(":");
-        let hour = Number(hh);
-        const period = hour >= 12 ? "PM" : "AM";
-        hour = hour % 12 || 12;
-        return `${hour}:${mm || "00"} ${period}`;
-    };
+    const formatDate = (value) => formatDisplayDate(value);
+    const formatTime = (value) => formatDisplayTime(value);
+    const poster = getPosterUrl(movie?.poster_url);
 
     const handleLogout = () => {
         localStorage.removeItem("token");
@@ -186,7 +181,7 @@ function SeatSelection() {
     }
 
     return (
-        <div className="seat-page">
+        <div className="seat-page" style={{ "--movie-backdrop": poster ? `url("${poster}")` : "none" }}>
             <header className="seat-navbar">
                 <button className="seat-logo" onClick={() => navigate("/home")} aria-label="Go home">
                     <img src={logo} alt="Movie Ticket Booking" />

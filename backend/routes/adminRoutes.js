@@ -1,6 +1,7 @@
 const express = require("express");
 const controller = require("../controllers/adminController");
 const { authenticateToken, requireAdmin } = require("../middleware/authMiddleware");
+const uploadPoster = require("../middleware/uploadPoster");
 
 const router = express.Router();
 router.use(authenticateToken, requireAdmin);
@@ -11,8 +12,8 @@ router.get("/management", controller.getManagementData);
 router.put("/users/:id", controller.updateUser);
 router.delete("/users/:id", controller.deleteUser);
 
-router.post("/movies", controller.createMovie);
-router.put("/movies/:id", controller.updateMovie);
+router.post("/movies", uploadPoster.single("poster"), controller.createMovie);
+router.put("/movies/:id", uploadPoster.single("poster"), controller.updateMovie);
 router.delete("/movies/:id", controller.deleteMovie);
 
 router.post("/theatres", controller.createTheatre);

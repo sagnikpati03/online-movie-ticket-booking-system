@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "./Home.css";
 import logo from "../../pictures/logo.png";
 import { API_URL } from "../../config/api";
+import { getPosterUrl } from "../../utils/display";
 
 function Home() {
     const navigate = useNavigate();
@@ -261,7 +262,7 @@ function Home() {
                                 <div className="movie-poster">
                                     {movie.poster_url ? (
                                         <img
-                                            src={movie.poster_url}
+                                            src={getPosterUrl(movie.poster_url)}
                                             alt={movie.title}
                                             onError={(e) => {
                                                 e.currentTarget.style.display = "none";

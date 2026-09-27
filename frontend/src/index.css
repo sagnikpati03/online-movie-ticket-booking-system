@@ -25,3 +25,385 @@ body {
 #root {
     min-height: 100vh;
 }
+/* =========================================================
+   SHARED DARK GLASS THEME FOR ALL NON-AUTH PAGES
+   Login and Register are intentionally excluded.
+   ========================================================= */
+
+:root {
+    --movie-glass-bg: rgba(20, 16, 25, 0.56);
+    --movie-glass-bg-strong: rgba(17, 13, 22, 0.76);
+    --movie-glass-border: rgba(255, 255, 255, 0.16);
+    --movie-glass-shadow: 0 12px 36px rgba(0, 0, 0, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.07);
+    --movie-text-primary: #ffffff;
+    --movie-text-secondary: rgba(255, 255, 255, 0.76);
+}
+
+.seat-page,
+.payment-page,
+.confirmation-page,
+.movie-details-page,
+.bookings-page,
+.admin-page {
+    position: relative;
+    isolation: isolate;
+    min-height: 100vh;
+    color: var(--movie-text-primary);
+    background: transparent !important;
+}
+
+.seat-page::before,
+.payment-page::before,
+.confirmation-page::before,
+.movie-details-page::before,
+.bookings-page::before,
+.admin-page::before {
+    content: "";
+    position: fixed;
+    inset: -18px;
+    z-index: -2;
+    pointer-events: none;
+    background: url("./pictures/background.jpg") center / cover no-repeat;
+    filter: blur(9px);
+    transform: scale(1.035);
+}
+
+.seat-page::after,
+.payment-page::after,
+.confirmation-page::after,
+.movie-details-page::after,
+.bookings-page::after,
+.admin-page::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(
+        135deg,
+        rgba(8, 6, 12, 0.72),
+        rgba(13, 9, 17, 0.62)
+    );
+}
+
+/* Frosted-glass navigation and content surfaces */
+.seat-navbar,
+.seat-layout-card,
+.seat-bottom-panel,
+.payment-navbar,
+.payment-method-card,
+.payment-summary-card,
+.confirmation-navbar,
+.ticket-card,
+.booking-number,
+.payment-summary,
+.movie-details-navbar,
+.movie-details-card,
+.show-card,
+.no-shows,
+.movie-info-item,
+.bookings-navbar,
+.booking-card,
+.booking-state,
+.admin-navbar,
+.admin-profile-menu,
+.stat-card,
+.management-panel,
+.entity-form,
+.admin-tabs,
+.admin-table-wrap,
+.admin-empty {
+    background: var(--movie-glass-bg) !important;
+    border: 1px solid var(--movie-glass-border) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(145%);
+    backdrop-filter: blur(20px) saturate(145%);
+    box-shadow: var(--movie-glass-shadow);
+}
+
+/* Make page-level headings and supporting copy readable over the dark backdrop. */
+.seat-heading h1,
+.seat-subtitle,
+.seat-legend,
+.seat-row-label,
+.seat-selection-summary,
+.seat-total,
+.payment-heading h1,
+.payment-heading > p:last-child,
+.payment-method-card h2,
+.payment-summary-card h2,
+.payment-method-copy strong,
+.payment-method-copy small,
+.confirmation-container,
+.success-section h1,
+.success-section p,
+.ticket-header h2,
+.detail-item strong,
+.payment-summary strong,
+.movie-information h1,
+.movie-description,
+.movie-info-item strong,
+.show-section-heading,
+.show-main,
+.show-date,
+.show-time,
+.show-price,
+.bookings-heading h1,
+.bookings-heading span,
+.booking-topline strong,
+.booking-main h2,
+.booking-theatre,
+.booking-details strong,
+.admin-heading h1,
+.admin-heading span,
+.panel-heading h2,
+.panel-heading span,
+.admin-section-header h2,
+.management-intro,
+.entity-form label,
+.admin-table th,
+.admin-table td {
+    color: var(--movie-text-primary);
+}
+
+.seat-subtitle,
+.seat-legend,
+.seat-row-label,
+.payment-heading > p:last-child,
+.payment-method-copy small,
+.success-section p,
+.detail-item span,
+.payment-summary span,
+.movie-description,
+.movie-info-item span,
+.bookings-heading span,
+.booking-theatre,
+.booking-details span,
+.admin-heading span,
+.panel-heading span,
+.management-intro {
+    color: var(--movie-text-secondary);
+}
+
+/* Translucent inputs and selectable controls */
+.payment-method-option,
+.admin-tabs,
+.admin-table input,
+.admin-table select,
+.entity-form input,
+.entity-form select,
+.entity-form textarea,
+.status-select {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+.entity-form input::placeholder,
+.entity-form textarea::placeholder {
+    color: rgba(255, 255, 255, 0.52);
+}
+
+/* Preserve readable white text on dark page navigation. */
+.seat-nav-links button,
+.payment-nav-links button,
+.confirmation-navbar nav button,
+.movie-details-navbar nav button,
+.bookings-nav-links a,
+.bookings-nav-links button,
+.admin-nav-links a,
+.admin-nav-links button {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.seat-nav-links button:hover,
+.payment-nav-links button:hover,
+.confirmation-navbar nav button:hover,
+.movie-details-navbar nav button:hover,
+.bookings-nav-links a:hover,
+.bookings-nav-links a.active,
+.bookings-nav-links button:hover,
+.admin-nav-links a:hover,
+.admin-nav-links a.active,
+.admin-nav-links button:hover {
+    color: #ff9bad;
+}
+
+/* Light-colored status chips remain distinct from the dark glass panels. */
+.booking-status,
+.admin-notice,
+.admin-error,
+.payment-demo-notice {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+@media (max-width: 700px) {
+    .seat-page::before,
+    .payment-page::before,
+    .confirmation-page::before,
+    .movie-details-page::before,
+    .bookings-page::before,
+    .admin-page::before {
+        filter: blur(7px);
+    }
+}
+
+
+/* =========================================================
+   THEME PATCH: consistent dark glass surfaces on all pages
+   Login and Register intentionally remain untouched.
+   ========================================================= */
+:root {
+  --movie-glass-bg: rgba(20, 16, 25, .58);
+  --movie-glass-strong: rgba(16, 12, 21, .84);
+  --movie-glass-border: rgba(255, 255, 255, .15);
+  --movie-text: #f7f5f7;
+  --movie-muted: rgba(245, 241, 246, .72);
+}
+
+.seat-page, .payment-page, .confirmation-page, .movie-details-page,
+.bookings-page, .admin-page {
+  color: var(--movie-text) !important;
+  background: transparent !important;
+  isolation: isolate;
+}
+
+.seat-page::before, .payment-page::before, .confirmation-page::before,
+.movie-details-page::before, .bookings-page::before, .admin-page::before {
+  content: ""; position: fixed; inset: -18px; z-index: -2; pointer-events: none;
+  background: url("./pictures/background.jpg") center / cover no-repeat;
+  filter: blur(9px); transform: scale(1.035);
+}
+.seat-page::after, .payment-page::after, .confirmation-page::after,
+.movie-details-page::after, .bookings-page::after, .admin-page::after {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(135deg, rgba(8,6,12,.78), rgba(13,9,17,.68));
+}
+
+.seat-navbar, .seat-layout-card, .seat-bottom-panel,
+.payment-navbar, .payment-method-card, .payment-summary-card,
+.confirmation-navbar, .ticket-card, .booking-number, .payment-summary,
+.movie-details-navbar, .movie-details-card, .show-card, .no-shows, .movie-info-item,
+.bookings-navbar, .booking-card, .booking-state,
+.admin-navbar, .admin-profile-menu, .stat-card, .management-intro,
+.management-panel, .admin-bookings-section, .entity-form, .admin-tabs,
+.admin-table-wrap, .admin-empty {
+  background: var(--movie-glass-bg) !important;
+  border: 1px solid var(--movie-glass-border) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(145%);
+  backdrop-filter: blur(20px) saturate(145%);
+  box-shadow: 0 12px 36px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+.seat-navbar, .payment-navbar, .confirmation-navbar, .movie-details-navbar,
+.bookings-navbar, .admin-navbar {
+  background: rgba(14, 10, 19, .84) !important;
+  border-bottom: 1px solid rgba(255,255,255,.13) !important;
+}
+
+/* Dark controls and panels: no bright white blocks on non-auth pages. */
+.seat-page .seat-show-meta span,
+.payment-page .payment-method-icon,
+.payment-page .payment-method-option.active,
+.payment-page .payment-demo-notice,
+.admin-page .quick-grid button,
+.admin-page .form-grid input,
+.admin-page .form-grid select,
+.admin-page .form-grid textarea,
+.admin-page .entity-form input[type="file"],
+.admin-page .status-select,
+.admin-page .admin-table input,
+.admin-page .admin-table select {
+  background: rgba(255,255,255,.075) !important;
+  color: #fff !important;
+  border-color: rgba(255,255,255,.16) !important;
+}
+
+.admin-page .management-intro, .admin-page .management-panel,
+.admin-page .admin-bookings-section, .admin-page .entity-form {
+  background: rgba(18, 14, 24, .72) !important;
+  border-color: rgba(255,255,255,.15) !important;
+}
+.admin-page .panel-heading, .admin-page .admin-section-header {
+  border-color: rgba(255,255,255,.13) !important;
+}
+.admin-page .admin-table-wrap { overflow-x: auto; }
+.admin-page .admin-table {
+  width: 100%; min-width: 780px; border-collapse: collapse; border-spacing: 0;
+  table-layout: fixed; color: #f7f5f7; background: transparent !important;
+}
+.admin-page .admin-table thead,
+.admin-page .admin-table thead tr,
+.admin-page .admin-table thead th {
+  background: rgba(255,255,255,.055) !important;
+  color: rgba(255,255,255,.78) !important;
+}
+.admin-page .admin-table th, .admin-page .admin-table td {
+  box-sizing: border-box; border: 0 !important;
+  border-bottom: 1px solid rgba(255,255,255,.13) !important;
+  padding: 14px 15px; text-align: left; vertical-align: middle;
+  white-space: normal; overflow-wrap: anywhere;
+}
+.admin-page .admin-table tbody tr { background: rgba(12,9,17,.24) !important; }
+.admin-page .admin-table tbody tr:hover { background: rgba(255,255,255,.035) !important; }
+.admin-page .admin-table tbody tr:last-child td { border-bottom: 0 !important; }
+.admin-page .admin-table td small { color: rgba(255,255,255,.58) !important; }
+.admin-page .quick-grid button { color: #f7f5f7 !important; border-radius: 9px; }
+.admin-page .form-grid label, .admin-page .form-title { color: #f7f5f7 !important; }
+.admin-page .form-grid input::placeholder, .admin-page .form-grid textarea::placeholder { color: rgba(255,255,255,.48); }
+.admin-page .admin-heading span, .admin-page .management-intro p,
+.admin-page .panel-heading span, .admin-page .stat-card span { color: var(--movie-muted) !important; }
+.admin-page .admin-profile-menu { background: rgba(20,16,25,.96) !important; }
+.admin-page .admin-profile-menu a, .admin-page .admin-profile-menu > button,
+.admin-page .profile-menu-user strong { color: #fff !important; }
+.admin-page .admin-profile-menu .profile-menu-user span { color: rgba(255,255,255,.6) !important; }
+.admin-page .admin-profile-menu .profile-role { background: rgba(169,29,53,.24) !important; color: #ff9bad !important; }
+.admin-page .quick-grid button:hover { border-color: rgba(255,155,173,.55) !important; }
+
+@media (max-width: 700px) {
+  .seat-page::before, .payment-page::before, .confirmation-page::before,
+  .movie-details-page::before, .bookings-page::before, .admin-page::before { filter: blur(7px); }
+  .admin-page .admin-table { min-width: 760px; }
+}
+
+/* Additional component surfaces that were previously still light. */
+.confirmation-page .ticket-header,
+.confirmation-page .ticket-body,
+.confirmation-page .payment-summary,
+.confirmation-page .booking-number,
+.bookings-page .booking-card,
+.bookings-page .booking-state,
+.payment-page .payment-method-option,
+.payment-page .payment-movie-summary,
+.movie-details-page .movie-details-error,
+.movie-details-page .no-shows,
+.seat-page .seat-empty,
+.seat-page .seat-bottom-panel {
+  background: rgba(20, 16, 25, .58) !important;
+  color: #f7f5f7;
+  border-color: rgba(255,255,255,.15) !important;
+}
+
+.payment-page::after,
+.movie-details-page::after,
+.seat-page::after {
+  background: linear-gradient(135deg, rgba(8,6,12,.78), rgba(13,9,17,.68)) !important;
+}
+.payment-page .payment-method-option.active {
+  background: rgba(169,29,53,.25) !important;
+  border-color: rgba(255,155,173,.65) !important;
+}
+.payment-page .payment-demo-notice {
+  background: rgba(120,91,35,.18) !important;
+  color: #f5dfaa !important;
+  border-color: rgba(245,223,170,.28) !important;
+}
+.payment-page .payment-method-icon { background: rgba(169,29,53,.22) !important; color: #ff9bad !important; }
+.seat-page .seat { background: rgba(255,255,255,.08) !important; color: #f7f5f7 !important; border-color: rgba(255,255,255,.22) !important; }
+.seat-page .seat.selected { background: #a91d35 !important; color: #fff !important; border-color: #ff9bad !important; }
+.seat-page .seat.booked, .seat-page .seat:disabled { background: rgba(130,130,140,.24) !important; color: rgba(255,255,255,.48) !important; }
+.seat-page .legend-seat.available { background: rgba(255,255,255,.08) !important; }
+.seat-page .seat-screen { background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.06)) !important; color: rgba(255,255,255,.72) !important; }
+.confirmation-page .ticket-header { background: rgba(169,29,53,.18) !important; }
+.confirmation-page .movie-poster, .confirmation-page .poster-placeholder { background: rgba(0,0,0,.3) !important; }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import logo from "../../pictures/logo.png";
 import { API_URL } from "../../config/api";
+import { formatDisplayDate, formatDisplayTime, getPosterUrl } from "../../utils/display";
 import "./BookingConfirmation.css";
 
 function BookingConfirmation() {
@@ -79,34 +80,8 @@ function BookingConfirmation() {
     }, [routeBookingId]);
 
 
-    const formatDate = (value) => {
-        if (!value) return "N/A";
-
-        const date = new Date(`${value}T00:00:00`);
-
-        return date.toLocaleDateString("en-IN", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
-        });
-    };
-
-
-    const formatTime = (value) => {
-        if (!value) return "N/A";
-
-        const [hourString, minuteString] =
-            String(value).slice(0, 5).split(":");
-
-        let hour = Number(hourString);
-
-        const period = hour >= 12 ? "PM" : "AM";
-
-        hour = hour % 12 || 12;
-
-        return `${hour}:${minuteString || "00"} ${period}`;
-    };
-
+    const formatDate = (value) => formatDisplayDate(value);
+    const formatTime = (value) => formatDisplayTime(value);
 
     const handleLogout = () => {
         localStorage.removeItem("token");
@@ -300,7 +275,7 @@ function BookingConfirmation() {
 
                             {booking.poster_url ? (
                                 <img
-                                    src={booking.poster_url}
+                                    src={getPosterUrl(booking.poster_url)}
                                     alt={movieTitle}
                                     className="movie-poster"
                                 />

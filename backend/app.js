@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 
 
 const authRoutes =
@@ -49,6 +50,9 @@ app.use(
 app.use(
     express.json()
 );
+
+// Publicly serve poster files uploaded by administrators.
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 
 /* =========================
@@ -123,13 +127,12 @@ app.use(
         );
 
 
-        res.status(
-            err.status || 500
-        ).json({
-            message:
-                err.message ||
-                "Internal server error."
-        });
+        const status = err.code === "LIMIT_FILE_SIZE" ? 413 : (err.status || 500);
+        const message = err.code === "LIMIT_FILE_SIZE"
+            ? "Poster image must be 5 MB or smaller."
+            : (err.message || "Internal server error.");
+
+        res.status(status).json({ message });
 
     }
 );

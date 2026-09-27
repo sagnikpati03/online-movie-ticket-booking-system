@@ -650,3 +650,100 @@
     .admin-heading span { display: block; line-height: 1.5; }
     .admin-section-header { align-items: flex-start; gap: 12px; flex-direction: column; }
 }
+
+
+/* Movie poster upload and 16:9 preview */
+.poster-preview-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-self: start;
+    color: #555;
+    font-size: 13px;
+}
+.admin-poster-preview {
+    display: block;
+    width: min(100%, 360px);
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border: 1px solid #e8d5d9;
+    border-radius: 10px;
+    background: #f4e3e6;
+}
+.entity-form input[type="file"] {
+    width: 100%;
+    min-height: 44px;
+    padding: 9px;
+    background: #fff;
+    border: 1px dashed #c9a5ac;
+    border-radius: 8px;
+}
+.entity-form label small {
+    display: block;
+    margin-top: 6px;
+    color: #777;
+    font-size: 12px;
+}
+
+.admin-movie-thumb {
+    display: block;
+    width: 112px;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 6px;
+    background: #f4e3e6;
+}
+.admin-no-thumb {
+    display: grid;
+    width: 112px;
+    aspect-ratio: 16 / 9;
+    place-items: center;
+    border-radius: 6px;
+    background: #f4e3e6;
+    font-size: 26px;
+}
+
+/* Admin dashboard glass surfaces */
+.admin-page { background: linear-gradient(135deg, #f7edf0, #f7f7f8 52%, #eee5e8); }
+.admin-navbar, .stat-card, .management-panel, .entity-form, .admin-tabs, .admin-table-wrap { background: rgba(255,255,255,.72); border-color: rgba(255,255,255,.78); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); box-shadow: 0 12px 34px rgba(40,20,25,.07); }
+.admin-poster-preview { width: min(100%, 440px); aspect-ratio: 16 / 9; height: auto; object-fit: contain; background: rgba(20,20,20,.92); }
+.admin-movie-thumb { width: 110px; height: 62px; object-fit: contain; background: #171717; border-radius: 6px; }
+
+
+/* Final dark-glass admin overrides: neutralize earlier light styles. */
+.admin-page { background: transparent !important; color: #f7f5f7; }
+.admin-page .admin-navbar { background: rgba(14,10,19,.84) !important; }
+.admin-page .stat-icon { background: rgba(169,29,53,.22) !important; color: #ff9bad; }
+.admin-page .quick-grid button { background: rgba(255,255,255,.055) !important; color: #f7f5f7; border-color: rgba(255,255,255,.14); }
+.admin-page .entity-form { background: rgba(18,14,24,.72) !important; border-color: rgba(255,255,255,.15) !important; }
+.admin-page .form-grid input, .admin-page .form-grid select, .admin-page .form-grid textarea,
+.admin-page .status-select { background: rgba(8,6,12,.48) !important; color: #fff !important; border-color: rgba(255,255,255,.18) !important; }
+.admin-page .form-grid select option, .admin-page .status-select option { background: #211b28; color: #fff; }
+.admin-page .admin-table { border-collapse: collapse; table-layout: fixed; }
+.admin-page .admin-table th, .admin-page .admin-table td { border-bottom: 1px solid rgba(255,255,255,.13) !important; }
+.admin-page .admin-table thead th { background: rgba(255,255,255,.055) !important; }
+.admin-page .actions button.danger { background: rgba(244,225,228,.12) !important; color: #ffb7c2 !important; border: 1px solid rgba(255,183,194,.25); }
+.admin-page .admin-movie-thumb, .admin-page .admin-no-thumb { background: rgba(255,255,255,.06) !important; }
+
+/* Admin visual seat-layout builder */
+.seat-builder { margin: 20px 24px; padding: 20px; border: 1px solid rgba(255,255,255,.15); border-radius: 12px; background: rgba(10,8,15,.32); }
+.seat-builder-title { margin: 0 0 14px; font-size: 17px; font-weight: 800; }
+.seat-builder-controls { display: grid; grid-template-columns: repeat(5, minmax(120px,1fr)); gap: 12px; align-items: end; }
+.seat-builder-controls label { display: flex; flex-direction: column; gap: 7px; color: rgba(255,255,255,.85); font-size: 12px; font-weight: 700; }
+.seat-builder-controls input, .seat-builder-controls select { width: 100%; min-width: 0; min-height: 40px; padding: 9px 10px; border: 1px solid rgba(255,255,255,.18); border-radius: 7px; background: rgba(8,6,12,.5); color: #fff; font: inherit; }
+.seat-builder-hint { margin: 14px 0; color: rgba(255,255,255,.65); font-size: 12px; line-height: 1.5; }
+.seat-builder-grid-wrap { overflow-x: auto; padding: 12px 0; }
+.seat-builder-grid { display: grid; gap: 9px; width: max-content; min-width: 100%; }
+.seat-builder-row { display: flex; align-items: center; gap: 8px; }
+.seat-builder-row-label { width: 24px; flex: 0 0 24px; color: rgba(255,255,255,.7); font-size: 12px; font-weight: 800; text-align: center; }
+.seat-builder-seat { width: 44px; height: 36px; flex: 0 0 44px; border: 1px solid rgba(255,255,255,.22); border-radius: 7px 7px 4px 4px; background: rgba(255,255,255,.07); color: #fff; font-size: 10px; font-weight: 800; cursor: pointer; }
+.seat-builder-seat.selected { background: #a91d35; border-color: #ff9bad; color: #fff; }
+.seat-builder-seat.existing { background: rgba(70,170,110,.2); border-color: rgba(117,220,153,.45); color: #a6efbc; cursor: not-allowed; }
+.seat-builder-seat:disabled { opacity: .85; }
+.seat-builder-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
+.seat-builder-footer strong { color: #fff; font-size: 13px; }
+.seat-builder-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.seat-builder-actions button { min-height: 38px; padding: 8px 13px; border: 1px solid rgba(255,255,255,.17); border-radius: 7px; background: rgba(255,255,255,.07); color: #fff; font-weight: 700; cursor: pointer; }
+.seat-builder-actions button.primary { background: #a91d35; border-color: #a91d35; }
+@media (max-width: 900px) { .seat-builder-controls { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 520px) { .seat-builder { margin: 16px 12px; padding: 14px; } .seat-builder-controls { grid-template-columns: 1fr; } }
