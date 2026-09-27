@@ -13,6 +13,8 @@ import MyBookings from "./pages/MyBookings/MyBookings";
 import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
 import BookingConfirmation from "./pages/BookingConfirmation/BookingConfirmation";
 import MovieDetails from "./pages/MovieDetails/MovieDetails";
+import SeatSelection from "./pages/SeatSelection/SeatSelection";
+import Payment from "./pages/Payment/Payment";
 
 function ProtectedRoute({ children }) {
     const token = localStorage.getItem("token");
@@ -56,6 +58,25 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <Home />
+                        </ProtectedRoute>
+                    }
+                />
+
+
+                <Route
+                    path="/seat-selection/:showId"
+                    element={
+                        <ProtectedRoute>
+                            <SeatSelection />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/payment"
+                    element={
+                        <ProtectedRoute>
+                            <Payment />
                         </ProtectedRoute>
                     }
                 />

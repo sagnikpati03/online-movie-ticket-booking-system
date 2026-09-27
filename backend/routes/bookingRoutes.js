@@ -1,6 +1,7 @@
 const express = require("express");
 
 const {
+    showSeats,
     create,
     myBookings,
     getOne,
@@ -13,6 +14,12 @@ const {
 } = require("../middleware/authMiddleware");
 
 const router = express.Router();
+
+router.get(
+    "/shows/:showId/seats",
+    authenticateToken,
+    showSeats
+);
 
 router.post(
     "/",

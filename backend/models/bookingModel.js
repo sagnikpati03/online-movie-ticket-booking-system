@@ -1,5 +1,62 @@
 const db = require("../config/db");
 
+
+async function getSeatsForShow(showId) {
+    const [showRows] = await db.execute(`
+        SELECT
+            s.id,
+            s.movie_id,
+            s.show_date,
+            s.start_time,
+            s.end_time,
+            s.base_price,
+            s.status,
+            s.screen_id,
+            m.title AS movie_title,
+            m.poster_url,
+            t.name AS theatre_name,
+            t.city,
+            sc.name AS screen_name
+        FROM shows s
+        INNER JOIN movies m ON m.id = s.movie_id
+        INNER JOIN theatres t ON t.id = s.theatre_id
+        INNER JOIN screens sc ON sc.id = s.screen_id
+        WHERE s.id = ? AND s.status = 'active'
+        LIMIT 1
+    `, [showId]);
+
+    if (!showRows.length) {
+        throw new Error("Show not found or is no longer active.");
+    }
+
+    const show = showRows[0];
+
+    const [seats] = await db.execute(`
+        SELECT
+            se.id,
+            se.seat_number,
+            se.seat_type,
+            se.price_multiplier,
+            se.is_active,
+            ROUND(? * se.price_multiplier, 2) AS price,
+            CASE WHEN b.id IS NULL THEN 0 ELSE 1 END AS is_booked
+        FROM seats se
+        LEFT JOIN booking_seats bs ON bs.seat_id = se.id
+        LEFT JOIN bookings b
+            ON b.id = bs.booking_id
+            AND b.show_id = ?
+            AND b.status IN ('pending', 'confirmed')
+        WHERE se.screen_id = ?
+          AND se.is_active = TRUE
+        GROUP BY
+            se.id, se.seat_number, se.seat_type, se.price_multiplier,
+            se.is_active, b.id
+        ORDER BY se.seat_number
+    `, [show.base_price, showId, show.screen_id]);
+
+    return { show, seats };
+}
+
 async function createBooking({
     userId,
     showId,
@@ -419,6 +476,7 @@ async function getDashboardStats() {
 }
 
 module.exports = {
+    getSeatsForShow,
     createBooking,
     getBookingsByUserId,
     getBookingByIdForUser,

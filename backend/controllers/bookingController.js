@@ -1,10 +1,40 @@
 const {
+    getSeatsForShow,
     createBooking,
     getBookingsByUserId,
     getBookingByIdForUser,
     getBookingByIdForAdmin,
     getAllBookings
 } = require("../models/bookingModel");
+
+
+async function showSeats(req, res) {
+    try {
+        const showId = Number(req.params.showId);
+
+        if (!Number.isInteger(showId) || showId <= 0) {
+            return res.status(400).json({ message: "Invalid show ID." });
+        }
+
+        const result = await getSeatsForShow(showId);
+
+        return res.status(200).json({
+            show: result.show,
+            movie: {
+                id: result.show.movie_id,
+                title: result.show.movie_title,
+                poster_url: result.show.poster_url
+            },
+            seats: result.seats
+        });
+    } catch (error) {
+        console.error("SHOW SEATS ERROR:", error);
+        const status = error.message === "Show not found or is no longer active." ? 404 : 500;
+        return res.status(status).json({
+            message: error.message || "Unable to fetch seats."
+        });
+    }
+}
 
 async function create(req, res) {
     try {
@@ -110,6 +140,7 @@ async function allBookings(req, res) {
 }
 
 module.exports = {
+    showSeats,
     create,
     myBookings,
     getOne,
