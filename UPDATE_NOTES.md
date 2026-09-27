@@ -18,3 +18,11 @@ The archive intentionally excludes the local `backend/.env` because it may conta
 
 1. In `backend`, install dependencies and configure `.env`, then start the API using the project's existing start script.
 2. In `frontend`, install dependencies and run `npm run dev`.
+
+
+## Customer ticket cancellation
+
+- Customers can cancel their own confirmed bookings from **My Bookings** before the show starts.
+- Cancellation is authenticated and restricted to the booking owner; the backend changes the booking status to `cancelled`.
+- Cancelled bookings no longer hold seats because seat availability checks only consider `pending` and `confirmed` bookings.
+- The app uses demo payments; cancellation does not initiate an actual payment-provider refund.

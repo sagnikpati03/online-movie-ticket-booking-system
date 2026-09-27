@@ -10,6 +10,9 @@ function MyBookings() {
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [cancelingId, setCancelingId] = useState(null);
+    const [actionError, setActionError] = useState("");
+    const [actionMessage, setActionMessage] = useState("");
 
     const user = JSON.parse(localStorage.getItem("user") || "null");
     const initial = user?.name?.trim()?.charAt(0)?.toUpperCase() || "U";
@@ -52,6 +55,51 @@ function MyBookings() {
         fetchBookings();
     }, []);
 
+    const handleCancelBooking = async (booking) => {
+        const confirmed = window.confirm(
+            `Cancel booking ${booking.booking_code} for ${booking.movie_title}?\n\nThe seats will be released. Demo payments are not automatically refunded.`
+        );
+
+        if (!confirmed) return;
+
+        setCancelingId(booking.id);
+        setActionError("");
+        setActionMessage("");
+
+        try {
+            const token = localStorage.getItem("token");
+            const response = await fetch(
+                `${API_URL}/api/bookings/${booking.id}/cancel`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            const data = await response.json();
+
+            if (response.status === 401) {
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                navigate("/login", { replace: true });
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error(data.message || "Unable to cancel this booking.");
+            }
+
+            setActionMessage(`Booking ${booking.booking_code} was cancelled.`);
+            await fetchBookings();
+        } catch (err) {
+            setActionError(err.message || "Unable to cancel this booking.");
+        } finally {
+            setCancelingId(null);
+        }
+    };
+
     const handleLogout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -87,6 +135,17 @@ function MyBookings() {
                     </div>
                     <Link to="/home" className="browse-link">Browse Movies</Link>
                 </div>
+
+                {actionError && (
+                    <div className="booking-alert booking-alert-error" role="alert">
+                        {actionError}
+                    </div>
+                )}
+                {actionMessage && (
+                    <div className="booking-alert booking-alert-success" role="status">
+                        {actionMessage}
+                    </div>
+                )}
 
                 {loading ? (
                     <div className="booking-state">
@@ -154,6 +213,19 @@ function MyBookings() {
                                             <strong>₹{Number(booking.total_amount || 0).toFixed(2)}</strong>
                                         </div>
                                     </div>
+                                    {booking.status === "confirmed" && (
+                                        <div className="booking-actions">
+                                            <button
+                                                type="button"
+                                                className="cancel-booking-button"
+                                                onClick={() => handleCancelBooking(booking)}
+                                                disabled={cancelingId === booking.id}
+                                            >
+                                                {cancelingId === booking.id ? "Cancelling..." : "Cancel Ticket"}
+                                            </button>
+                                            <span>Cancellation is available before the show starts.</span>
+                                        </div>
+                                    )}
                                 </div>
                             </article>
                         ))}

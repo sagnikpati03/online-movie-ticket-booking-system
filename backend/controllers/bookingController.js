@@ -2,6 +2,7 @@ const {
     getSeatsForShow,
     createBooking,
     getBookingsByUserId,
+    cancelBookingForUser,
     getBookingByIdForUser,
     getBookingByIdForAdmin,
     getAllBookings
@@ -98,6 +99,41 @@ async function myBookings(req, res) {
     }
 }
 
+
+async function cancelMyBooking(req, res) {
+    try {
+        const bookingId = Number(req.params.id);
+
+        if (!Number.isInteger(bookingId) || bookingId <= 0) {
+            return res.status(400).json({ message: "Invalid booking ID." });
+        }
+
+        const booking = await cancelBookingForUser(bookingId, req.user.id);
+
+        return res.status(200).json({
+            message: "Your booking has been cancelled.",
+            booking
+        });
+    } catch (error) {
+        if (error.code === "BOOKING_NOT_FOUND") {
+            return res.status(404).json({ message: error.message });
+        }
+
+        if (error.code === "BOOKING_NOT_CANCELLABLE") {
+            return res.status(409).json({ message: error.message });
+        }
+
+        if (error.code === "BOOKING_CUTOFF") {
+            return res.status(409).json({ message: error.message });
+        }
+
+        console.error("CANCEL BOOKING ERROR:", error);
+        return res.status(500).json({
+            message: "Unable to cancel this booking right now."
+        });
+    }
+}
+
 async function getOne(req, res) {
     try {
         const bookingId = Number(req.params.id);
@@ -143,6 +179,7 @@ module.exports = {
     showSeats,
     create,
     myBookings,
+    cancelMyBooking,
     getOne,
     allBookings
 };

@@ -225,6 +225,65 @@ async function createBooking({
     }
 }
 
+
+async function cancelBookingForUser(bookingId, userId) {
+    const connection = await db.getConnection();
+
+    try {
+        await connection.beginTransaction();
+
+        const [rows] = await connection.execute(`
+            SELECT
+                b.id,
+                b.status,
+                TIMESTAMP(s.show_date, s.start_time) AS show_starts_at
+            FROM bookings b
+            INNER JOIN shows s ON s.id = b.show_id
+            WHERE b.id = ? AND b.user_id = ?
+            LIMIT 1
+            FOR UPDATE
+        `, [bookingId, userId]);
+
+        if (!rows.length) {
+            const error = new Error("Booking not found.");
+            error.code = "BOOKING_NOT_FOUND";
+            throw error;
+        }
+
+        const booking = rows[0];
+
+        if (booking.status !== "confirmed") {
+            const error = new Error("Only confirmed bookings can be cancelled.");
+            error.code = "BOOKING_NOT_CANCELLABLE";
+            throw error;
+        }
+
+        const [updated] = await connection.execute(`
+            UPDATE bookings b
+            INNER JOIN shows s ON s.id = b.show_id
+            SET b.status = 'cancelled'
+            WHERE b.id = ?
+              AND b.user_id = ?
+              AND b.status = 'confirmed'
+              AND TIMESTAMP(s.show_date, s.start_time) > NOW()
+        `, [bookingId, userId]);
+
+        if (updated.affectedRows !== 1) {
+            const error = new Error("This booking can no longer be cancelled because the show has started.");
+            error.code = "BOOKING_CUTOFF";
+            throw error;
+        }
+
+        await connection.commit();
+        return await getBookingByIdForUser(bookingId, userId);
+    } catch (error) {
+        await connection.rollback();
+        throw error;
+    } finally {
+        connection.release();
+    }
+}
+
 async function getBookingsByUserId(userId) {
     const [rows] = await db.execute(`
         SELECT
@@ -479,6 +538,7 @@ module.exports = {
     getSeatsForShow,
     createBooking,
     getBookingsByUserId,
+    cancelBookingForUser,
     getBookingByIdForUser,
     getBookingByIdForAdmin,
     getAllBookings,

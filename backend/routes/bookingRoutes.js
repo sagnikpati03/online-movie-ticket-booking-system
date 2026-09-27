@@ -4,6 +4,7 @@ const {
     showSeats,
     create,
     myBookings,
+    cancelMyBooking,
     getOne,
     allBookings
 } = require("../controllers/bookingController");
@@ -38,6 +39,12 @@ router.get(
     authenticateToken,
     requireAdmin,
     allBookings
+);
+
+router.patch(
+    "/:id/cancel",
+    authenticateToken,
+    cancelMyBooking
 );
 
 router.get(
