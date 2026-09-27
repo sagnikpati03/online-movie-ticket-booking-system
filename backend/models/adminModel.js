@@ -145,31 +145,90 @@ async function getSeats() {
     return rows;
 }
 
+async function assertSeatLabelAvailable(screenId, seatNumber, excludeId = null) {
+    const params = [Number(screenId), String(seatNumber).trim().toUpperCase()];
+    let excludeSql = "";
+    if (excludeId !== null) {
+        excludeSql = " AND id <> ?";
+        params.push(Number(excludeId));
+    }
+    const [rows] = await db.execute(`
+        SELECT id FROM seats
+        WHERE screen_id = ? AND UPPER(TRIM(seat_number)) = ?${excludeSql}
+        LIMIT 1
+    `, params);
+    if (rows.length) {
+        throw Object.assign(new Error("That seat number already exists on this screen."), { status: 409 });
+    }
+}
+
 async function createSeat(data) {
+    const seatNumber = String(data.seat_number).trim().toUpperCase();
+    await assertSeatLabelAvailable(data.screen_id, seatNumber);
     const [result] = await db.execute(`
         INSERT INTO seats (screen_id, seat_number, seat_type, price_multiplier, is_active)
         VALUES (?, ?, ?, ?, ?)
     `, [
-        Number(data.screen_id), data.seat_number, data.seat_type || "regular",
+        Number(data.screen_id), seatNumber, data.seat_type || "regular",
         Number(data.price_multiplier || 1), data.is_active !== false
     ]);
     return result.insertId;
 }
 
 async function updateSeat(id, data) {
+    const seatNumber = String(data.seat_number).trim().toUpperCase();
+    await assertSeatLabelAvailable(data.screen_id, seatNumber, id);
     const [result] = await db.execute(`
         UPDATE seats SET screen_id=?, seat_number=?, seat_type=?,
         price_multiplier=?, is_active=? WHERE id=?
     `, [
-        Number(data.screen_id), data.seat_number, data.seat_type || "regular",
+        Number(data.screen_id), seatNumber, data.seat_type || "regular",
         Number(data.price_multiplier || 1), data.is_active !== false, id
     ]);
     return result.affectedRows;
 }
 
 async function deleteSeat(id) {
-    const [result] = await db.execute(`DELETE FROM seats WHERE id=?`, [id]);
-    return result.affectedRows;
+    // Preserve booking history: deactivate seats that are referenced by any booking.
+    // Lock the seat row so a booking cannot race with this deletion decision.
+    const connection = await db.getConnection();
+
+    try {
+        await connection.beginTransaction();
+
+        const [seatRows] = await connection.execute(
+            `SELECT id FROM seats WHERE id = ? FOR UPDATE`,
+            [id]
+        );
+
+        if (!seatRows.length) {
+            await connection.rollback();
+            return { action: "not_found" };
+        }
+
+        const [[usage]] = await connection.execute(
+            `SELECT COUNT(*) AS booking_count FROM booking_seats WHERE seat_id = ?`,
+            [id]
+        );
+
+        if (Number(usage.booking_count) > 0) {
+            await connection.execute(
+                `UPDATE seats SET is_active = FALSE WHERE id = ?`,
+                [id]
+            );
+            await connection.commit();
+            return { action: "deactivated" };
+        }
+
+        await connection.execute(`DELETE FROM seats WHERE id = ?`, [id]);
+        await connection.commit();
+        return { action: "deleted" };
+    } catch (error) {
+        await connection.rollback();
+        throw error;
+    } finally {
+        connection.release();
+    }
 }
 
 /* SHOWS */

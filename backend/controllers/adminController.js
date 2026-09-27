@@ -13,7 +13,7 @@ const sendError = (res, error, fallback = "Operation failed.") => {
     return res.status(error?.status || (duplicate ? 409 : foreignKey ? 409 : 500)).json({
         message: duplicate ? "A record with the same unique value already exists."
             : foreignKey ? "This record is being used by another part of the system and cannot be deleted."
-            : fallback
+            : (error?.status ? error.message : fallback)
     });
 };
 
@@ -100,7 +100,25 @@ function validateScreen(d){if(!id(d.theatre_id)||!d.name?.trim()||Number(d.seat_
 /* SEATS */
 async function createSeat(req,res){try{validateSeat(req.body);const seatId=await admin.createSeat(req.body);return res.status(201).json({message:"Seat added successfully.",id:seatId});}catch(e){return sendError(res,e,"Unable to add seat.");}}
 async function updateSeat(req,res){try{validateSeat(req.body);const seatId=id(req.params.id);if(!seatId)return res.status(400).json({message:"Invalid seat ID."});await admin.updateSeat(seatId,req.body);return res.json({message:"Seat updated successfully."});}catch(e){return sendError(res,e,"Unable to update seat.");}}
-async function deleteSeat(req,res){try{const seatId=id(req.params.id);if(!seatId)return res.status(400).json({message:"Invalid seat ID."});await admin.deleteSeat(seatId);return res.json({message:"Seat deleted successfully."});}catch(e){return sendError(res,e,"Unable to delete seat.");}}
+async function deleteSeat(req, res) {
+    try {
+        const seatId = id(req.params.id);
+        if (!seatId) return res.status(400).json({ message: "Invalid seat ID." });
+
+        const result = await admin.deleteSeat(seatId);
+        if (result.action === "not_found") {
+            return res.status(404).json({ message: "Seat not found." });
+        }
+        if (result.action === "deactivated") {
+            return res.json({
+                message: "This seat has booking history, so it was deactivated instead of being permanently deleted."
+            });
+        }
+        return res.json({ message: "Seat deleted successfully." });
+    } catch (e) {
+        return sendError(res, e, "Unable to delete seat.");
+    }
+}
 function validateSeat(d){if(!id(d.screen_id)||!d.seat_number?.trim()||!["regular","premium","vip"].includes(d.seat_type)||Number(d.price_multiplier)<=0)throw Object.assign(new Error("Screen, seat number, type and valid multiplier are required."),{status:400});}
 
 /* SHOWS */

@@ -402,7 +402,7 @@ function AdminDashboard() {
                         <Table><thead><tr><th>Seat</th><th>Screen</th><th>Theatre</th><th>Type</th><th>Multiplier</th><th>Active</th><th>Actions</th></tr></thead>
                             <tbody>{data.seats.map(s => <tr key={s.id}><td><strong>{s.seat_number}</strong></td><td>{s.screen_name}</td><td>{s.theatre_name}</td><td>{s.seat_type}</td><td>{Number(s.price_multiplier).toFixed(2)}×</td><td>{s.is_active ? "Yes":"No"}</td><td className="actions">
                                 <button onClick={() => {setSeat({...s, is_active: Boolean(s.is_active)});setEditing("seat");}}>Edit</button>
-                                <button className="danger" onClick={() => remove(`/api/admin/seats/${s.id}`, `Delete seat ${s.seat_number}?`)}>Delete</button>
+                                <button className="danger" onClick={() => remove(`/api/admin/seats/${s.id}`, `Remove seat ${s.seat_number}? If it has booking history, it will be deactivated instead of permanently deleted.`)}>Delete</button>
                             </td></tr>)}</tbody>
                         </Table>
                     </ManagementPanel>

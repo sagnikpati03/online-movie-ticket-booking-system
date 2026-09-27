@@ -12,17 +12,17 @@ function Payment() {
     const booking = location.state || {};
     const show = booking.show || {};
     const movie = booking.movie || {};
-    const seats = Array.isArray(booking.seats) ? booking.seats : [];
-    const seatIds = Array.isArray(booking.seatIds) ? booking.seatIds : [];
+    const rawSeats = Array.isArray(booking.seats) ? booking.seats : [];
+    const seats = [...new Map(rawSeats.map((seat) => [
+        String(seat.seat_number || seat.id).trim().toUpperCase(), seat
+    ])).values()];
+    const seatIds = [...new Set(seats.map((seat) => Number(seat.id)).filter(Number.isInteger))];
 
     const [paymentMethod, setPaymentMethod] = useState("upi");
     const [processing, setProcessing] = useState(false);
     const [error, setError] = useState("");
 
-    const amount = Number(
-        booking.totalAmount ??
-        seats.reduce((sum, seat) => sum + Number(seat.price || 0), 0)
-    );
+    const amount = seats.reduce((sum, seat) => sum + Number(seat.price || 0), 0);
 
     const formatDate = (value) => formatDisplayDate(value);
     const formatTime = (value) => formatDisplayTime(value);

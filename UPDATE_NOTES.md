@@ -26,3 +26,12 @@ The archive intentionally excludes the local `backend/.env` because it may conta
 - Cancellation is authenticated and restricted to the booking owner; the backend changes the booking status to `cancelled`.
 - Cancelled bookings no longer hold seats because seat availability checks only consider `pending` and `confirmed` bookings.
 - The app uses demo payments; cancellation does not initiate an actual payment-provider refund.
+
+## Duplicate-seat and booking consistency fix
+
+- Seat availability now returns one active seat per normalized seat label (case/whitespace-insensitive), even if older database data contains duplicate seat rows.
+- If any legacy duplicate seat label is actively booked for a show, the single displayed seat is marked booked.
+- Booking creation checks booking status across all legacy rows sharing the selected seat label and locks the show row during booking to reduce simultaneous duplicate bookings.
+- Seat selection and checkout defensively de-duplicate seat labels/IDs so the same label is not repeated in the selection or payment summary.
+- Admin seat creation/editing trims and uppercases seat labels and rejects a duplicate label on the same screen.
+- Existing booking history is preserved; this update does not delete legacy duplicate rows or booking records.

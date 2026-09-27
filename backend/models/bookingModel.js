@@ -31,6 +31,9 @@ async function getSeatsForShow(showId) {
 
     const show = showRows[0];
 
+    // Collapse legacy duplicate seat labels (for example, "5" and "5") to
+    // one visible seat. If any legacy row with that label is booked for this
+    // show, the canonical seat is shown as booked too.
     const [seats] = await db.execute(`
         SELECT
             se.id,
@@ -39,20 +42,26 @@ async function getSeatsForShow(showId) {
             se.price_multiplier,
             se.is_active,
             ROUND(? * se.price_multiplier, 2) AS price,
-            CASE WHEN b.id IS NULL THEN 0 ELSE 1 END AS is_booked
+            CASE WHEN EXISTS (
+                SELECT 1
+                FROM seats duplicate_seat
+                INNER JOIN booking_seats bs ON bs.seat_id = duplicate_seat.id
+                INNER JOIN bookings b ON b.id = bs.booking_id
+                WHERE duplicate_seat.screen_id = se.screen_id
+                  AND UPPER(TRIM(duplicate_seat.seat_number)) = UPPER(TRIM(se.seat_number))
+                  AND b.show_id = ?
+                  AND b.status IN ('pending', 'confirmed')
+            ) THEN 1 ELSE 0 END AS is_booked
         FROM seats se
-        LEFT JOIN booking_seats bs ON bs.seat_id = se.id
-        LEFT JOIN bookings b
-            ON b.id = bs.booking_id
-            AND b.show_id = ?
-            AND b.status IN ('pending', 'confirmed')
-        WHERE se.screen_id = ?
-          AND se.is_active = TRUE
-        GROUP BY
-            se.id, se.seat_number, se.seat_type, se.price_multiplier,
-            se.is_active, b.id
-        ORDER BY se.seat_number
-    `, [show.base_price, showId, show.screen_id]);
+        INNER JOIN (
+            SELECT screen_id, UPPER(TRIM(seat_number)) AS normalized_number, MIN(id) AS canonical_id
+            FROM seats
+            WHERE screen_id = ? AND is_active = TRUE
+            GROUP BY screen_id, UPPER(TRIM(seat_number))
+        ) canonical ON canonical.canonical_id = se.id
+        WHERE se.screen_id = ? AND se.is_active = TRUE
+        ORDER BY se.seat_number, se.id
+    `, [show.base_price, showId, show.screen_id, show.screen_id]);
 
     return { show, seats };
 }
@@ -94,6 +103,7 @@ async function createBooking({
             INNER JOIN screens sc ON sc.id = s.screen_id
             WHERE s.id = ? AND s.status = 'active'
             LIMIT 1
+            FOR UPDATE
         `, [showId]);
 
         if (!shows.length) {
@@ -139,12 +149,16 @@ async function createBooking({
         // A seat is considered unavailable for this show if it is already
         // attached to a pending/confirmed booking for the same show.
         const [alreadyBooked] = await connection.execute(`
-            SELECT bs.seat_id
-            FROM booking_seats bs
+            SELECT selected.id AS seat_id
+            FROM seats selected
+            INNER JOIN seats same_label
+                ON same_label.screen_id = selected.screen_id
+               AND UPPER(TRIM(same_label.seat_number)) = UPPER(TRIM(selected.seat_number))
+            INNER JOIN booking_seats bs ON bs.seat_id = same_label.id
             INNER JOIN bookings b ON b.id = bs.booking_id
             WHERE b.show_id = ?
               AND b.status IN ('pending', 'confirmed')
-              AND bs.seat_id IN (${placeholders})
+              AND selected.id IN (${placeholders})
             FOR UPDATE
         `, [showId, ...uniqueSeatIds]);
 

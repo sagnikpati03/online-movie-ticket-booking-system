@@ -75,7 +75,13 @@ function SeatSelection() {
     }, [showId, navigate]);
 
     const sortedSeats = useMemo(() => {
-        return [...seats].sort((a, b) =>
+        // Defensive deduplication by normalized seat label for old databases.
+        const unique = new Map();
+        [...seats].sort((a, b) => Number(a.id) - Number(b.id)).forEach((seat) => {
+            const label = String(seat.seat_number || "").trim().toUpperCase();
+            if (label && !unique.has(label)) unique.set(label, seat);
+        });
+        return [...unique.values()].sort((a, b) =>
             String(a.seat_number).localeCompare(String(b.seat_number), undefined, {
                 numeric: true,
                 sensitivity: "base"
@@ -104,7 +110,7 @@ function SeatSelection() {
         return Array.from(rows.entries());
     }, [sortedSeats]);
 
-    const selectedSeatObjects = seats.filter((seat) =>
+    const selectedSeatObjects = sortedSeats.filter((seat) =>
         selectedSeats.includes(Number(seat.id))
     );
 
@@ -117,6 +123,7 @@ function SeatSelection() {
         if (seat.is_booked || !seat.is_active) return;
 
         const id = Number(seat.id);
+        if (!Number.isInteger(id)) return;
         setSelectedSeats((current) =>
             current.includes(id)
                 ? current.filter((selectedId) => selectedId !== id)
@@ -227,7 +234,7 @@ function SeatSelection() {
                                         {rowSeats.map((seat) => {
                                             const selected = selectedSeats.includes(Number(seat.id));
                                             const booked = Boolean(Number(seat.is_booked));
-                                            const inactive = !Boolean(Number(seat.is_active));
+                                            const inactive = !Number(seat.is_active);
 
                                             return (
                                                 <button
